@@ -1,0 +1,30 @@
+<h2>Welcome to EZKEY!</h2>
+
+<p>Your verification code is:</p>
+
+<p
+  style="
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 10px;
+    text-align: center;
+    padding: 20px;
+    background: #f4f4f5;
+    border-radius: 8px;
+  "
+>
+  {{ .Token }}
+</p>
+
+<p>Enter this code on the verification page to complete your sign-up.</p>
+
+<p>
+  <a href="{{ .SiteURL }}/auth/verify-email?email={{ .Email }}">
+    Open verification page
+  </a>
+</p>
+
+<p style="font-size: 12px; color: #71717a;">
+  This code expires shortly. If it does not work, request a new code from the
+  EZKEY sign-up page.
+</p>

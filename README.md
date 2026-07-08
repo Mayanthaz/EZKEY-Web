@@ -24,6 +24,20 @@ liveness, and face matching. EZKEY creates a Didit session from
 `/api/kyc/didit/session`, opens the returned URL in the Didit web SDK modal,
 then records the result from `/api/webhooks/didit` or the callback refresh page.
 
+## Supabase email confirmation
+
+EZKEY uses a 6-digit OTP code for sign-up confirmation. In Supabase Dashboard,
+open Authentication > Email Templates > Confirm signup and paste the HTML from
+`supabase/templates/confirm-signup.html`.
+
+Avoid using a raw `{{ .ConfirmationURL }}` link in the email body. Some email
+clients and security scanners prefetch links, which can consume the one-time
+token before the user clicks it and cause `otp_expired` redirects.
+
+For hosted Supabase settings, set the Auth Site URL to the deployed app URL, and
+add local/dev callback URLs such as `http://localhost:3000/**` to the redirect
+allow list when testing locally.
+
 Required environment variables:
 
 ```env
