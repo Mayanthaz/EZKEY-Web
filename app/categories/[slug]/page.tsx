@@ -3,6 +3,12 @@ import Link from "next/link";
 import { ArrowLeft, ChevronRight, Gamepad2, Zap, Star, BadgeCheck } from "lucide-react";
 import { MOCK_LISTINGS, MOCK_CATEGORIES, PLATFORM_LABELS } from "@/lib/constants";
 
+export function generateStaticParams() {
+  return MOCK_CATEGORIES.map((category) => ({
+    slug: category.slug,
+  }));
+}
+
 export async function generateMetadata({
   params,
 }: {

@@ -16,7 +16,7 @@ import {
   Store,
   ShoppingCart,
 } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 const sellerLinks = [
   { href: "/dashboard/seller", label: "Overview", icon: LayoutDashboard },
@@ -33,6 +33,15 @@ const buyerLinks = [
   { href: "/dashboard/buyer/messages", label: "Messages", icon: MessageSquare },
   { href: "/dashboard/buyer/settings", label: "Settings", icon: Settings },
 ];
+
+function DashboardContentFallback() {
+  return (
+    <div className="min-h-[50vh] animate-pulse space-y-4">
+      <div className="h-8 w-48 rounded-lg bg-cyber-card" />
+      <div className="h-32 rounded-xl bg-cyber-card" />
+    </div>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -143,7 +152,9 @@ export default function DashboardLayout({
           })}
         </div>
 
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="p-6 lg:p-8">
+          <Suspense fallback={<DashboardContentFallback />}>{children}</Suspense>
+        </div>
       </main>
     </div>
   );

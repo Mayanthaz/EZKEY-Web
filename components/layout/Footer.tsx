@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CurrentYear from "@/components/layout/CurrentYear";
 import {
   Gamepad2,
   Twitter,
@@ -155,7 +156,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between py-6 border-t border-cyber-border gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} EZKEY. All rights reserved.
+            © <CurrentYear /> EZKEY. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/terms" className="hover:text-foreground transition-colors">
