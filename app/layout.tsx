@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ChatbotFab from "@/components/chatbot-fab";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -77,16 +77,10 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased bg-cyber-dark text-foreground custom-scrollbar`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+        <ChatbotFab />
       </body>
     </html>
   );

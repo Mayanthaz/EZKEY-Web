@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
+import { hasEnvVars } from "@/lib/utils";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export default function Navbar() {
@@ -26,9 +27,13 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<SupabaseUser | null>(null);
 
-  const supabase = createClient();
+  const supabase = hasEnvVars ? createClient() : null;
 
   useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
     const getUser = async () => {
       const {
         data: { user },
@@ -53,6 +58,10 @@ export default function Navbar() {
   }, []);
 
   const handleSignOut = async () => {
+    if (!supabase) {
+      return;
+    }
+
     await supabase.auth.signOut();
     setUser(null);
     setIsProfileOpen(false);
