@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ChatbotFab from "@/components/chatbot-fab";
+import SupabaseAuthErrorRedirect from "@/components/auth/SupabaseAuthErrorRedirect";
+import { Suspense } from "react";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -77,6 +79,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased bg-cyber-dark text-foreground custom-scrollbar`}
       >
+        <Suspense fallback={null}>
+          <SupabaseAuthErrorRedirect />
+        </Suspense>
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
