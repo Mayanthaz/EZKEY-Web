@@ -51,6 +51,7 @@ export function SignUpForm({
         },
       });
       if (error) throw error;
+      window.sessionStorage.setItem("ezkey:pending-signup-email", email);
       router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
