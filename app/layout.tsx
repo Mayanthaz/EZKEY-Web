@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Orbitron } from "next/font/google";
+import { Poppins, JetBrains_Mono, Orbitron } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ChatbotFab from "@/components/chatbot-fab";
@@ -49,10 +49,11 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   display: "swap",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 const orbitron = Orbitron({
@@ -77,7 +78,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${orbitron.variable} ${jetBrainsMono.variable} font-sans antialiased bg-cyber-dark text-foreground custom-scrollbar`}
+        className={`${poppins.variable} ${orbitron.variable} ${jetBrainsMono.variable} font-sans antialiased bg-cyber-dark text-foreground custom-scrollbar`}
       >
         <Navbar />
         <main className="min-h-screen">{children}</main>

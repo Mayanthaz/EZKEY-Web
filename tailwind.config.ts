@@ -75,8 +75,8 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-orbitron)", "monospace"],
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        display: ["var(--font-poppins)", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
       animation: {

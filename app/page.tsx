@@ -50,8 +50,9 @@ export default function HomePage() {
             </div>
 
             {/* Heading */}
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black
-                         leading-tight tracking-tight mb-6 animate-slide-up">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black
+                         leading-tight tracking-tight mb-6 animate-slide-up"
+                style={{ fontFamily: "var(--font-orbitron), monospace" }}>
               <span className="text-foreground">Your Premium</span>
               <br />
               <span className="text-gradient">Digital Marketplace</span>
