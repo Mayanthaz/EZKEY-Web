@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Mail, Shield, CreditCard, Save } from "lucide-react";
+import { User, Shield, CreditCard, Save } from "lucide-react";
 
 export default function SellerSettingsPage() {
   return (

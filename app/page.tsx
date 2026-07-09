@@ -16,7 +16,6 @@ import {
 import {
   MOCK_LISTINGS,
   MOCK_CATEGORIES,
-  TRUST_BADGES,
   PLATFORM_LABELS,
 } from "@/lib/constants";
 
@@ -185,7 +184,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredListings.map((listing, i) => (
+            {featuredListings.map((listing) => (
               <Link
                 key={listing.id}
                 href={`/marketplace/${listing.slug}`}

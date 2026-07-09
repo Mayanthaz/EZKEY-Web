@@ -10,7 +10,6 @@ import {
   Zap,
   Star,
   BadgeCheck,
-  ChevronDown,
   Grid3X3,
   LayoutList,
   ArrowUpDown,

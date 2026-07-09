@@ -8,9 +8,7 @@ import {
   ArrowUpRight,
   Clock,
   Gamepad2,
-  Zap,
   Shield,
-  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 

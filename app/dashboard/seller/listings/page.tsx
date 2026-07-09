@@ -1,6 +1,6 @@
 "use client";
 
-import { Gamepad2, Plus, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Search } from "lucide-react";
+import { Gamepad2, Plus, Edit, Trash2, Eye, Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { MOCK_LISTINGS, PLATFORM_LABELS } from "@/lib/constants";

@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Search,
   ShoppingCart,
   Bell,
-  User,
   Menu,
   X,
   Gamepad2,
@@ -27,7 +26,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<SupabaseUser | null>(null);
 
-  const supabase = hasEnvVars ? createClient() : null;
+  const supabase = useMemo(() => (hasEnvVars ? createClient() : null), []);
 
   useEffect(() => {
     if (!supabase) {
@@ -49,7 +48,7 @@ export default function Navbar() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);

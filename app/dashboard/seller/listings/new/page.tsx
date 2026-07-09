@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Upload, Plus, X, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Upload, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { MOCK_CATEGORIES, PLATFORM_LABELS } from "@/lib/constants";
 

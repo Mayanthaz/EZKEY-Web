@@ -12,7 +12,6 @@ import {
   Key,
   ChevronLeft,
   ChevronRight,
-  Gamepad2,
   Store,
   ShoppingCart,
 } from "lucide-react";
