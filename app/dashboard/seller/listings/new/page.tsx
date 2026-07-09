@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Upload, Plus, X, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Upload, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { MOCK_CATEGORIES, PLATFORM_LABELS } from "@/lib/constants";
 
@@ -158,11 +158,11 @@ export default function NewListingPage() {
             ))}
           </div>
 
-          {/* Game Keys Input */}
+          {/* Digital Keys Input */}
           {deliveryType === "instant" && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Game Keys</label>
+                <label className="text-sm font-medium">Digital Keys</label>
                 <button
                   type="button"
                   onClick={addKeyField}

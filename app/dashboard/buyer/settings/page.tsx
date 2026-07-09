@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Mail, Bell, Shield, Save } from "lucide-react";
+import { User, Mail, Bell, Save } from "lucide-react";
 
 export default function BuyerSettingsPage() {
   return (

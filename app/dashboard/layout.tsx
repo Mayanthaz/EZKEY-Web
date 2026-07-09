@@ -4,27 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  ShoppingBag,
-  Package,
-  Wallet,
   Settings,
   MessageSquare,
   Key,
   ChevronLeft,
   ChevronRight,
-  Gamepad2,
   Store,
   ShoppingCart,
 } from "lucide-react";
-import { useState } from "react";
-
-const sellerLinks = [
-  { href: "/dashboard/seller", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/seller/listings", label: "My Listings", icon: ShoppingBag },
-  { href: "/dashboard/seller/orders", label: "Orders", icon: Package },
-  { href: "/dashboard/seller/payouts", label: "Payouts", icon: Wallet },
-  { href: "/dashboard/seller/settings", label: "Settings", icon: Settings },
-];
+import { Suspense, useState } from "react";
 
 const buyerLinks = [
   { href: "/dashboard/buyer", label: "Overview", icon: LayoutDashboard },
@@ -34,6 +22,20 @@ const buyerLinks = [
   { href: "/dashboard/buyer/settings", label: "Settings", icon: Settings },
 ];
 
+const mobileLinks = [
+  { href: "/become-a-seller", label: "Become a Seller", icon: Store },
+  ...buyerLinks,
+];
+
+function DashboardContentFallback() {
+  return (
+    <div className="min-h-[50vh] animate-pulse space-y-4">
+      <div className="h-8 w-48 rounded-lg bg-cyber-card" />
+      <div className="h-32 rounded-xl bg-cyber-card" />
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -41,8 +43,6 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const isSeller = pathname.includes("/seller");
-  const links = isSeller ? sellerLinks : buyerLinks;
 
   return (
     <div className="flex min-h-screen bg-cyber-dark pt-16 lg:pt-20">
@@ -55,23 +55,15 @@ export default function DashboardLayout({
         <div className={`p-4 border-b border-cyber-border ${collapsed ? "px-3" : ""}`}>
           <div className="flex gap-1">
             <Link
-              href="/dashboard/seller"
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                isSeller
-                  ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              }`}
+              href="/become-a-seller"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
             >
               <Store className="w-4 h-4" />
-              {!collapsed && "Seller"}
+              {!collapsed && "Become a Seller"}
             </Link>
             <Link
               href="/dashboard/buyer"
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                !isSeller
-                  ? "bg-neon-blue/10 text-neon-blue border border-neon-blue/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 transition-all"
             >
               <ShoppingCart className="w-4 h-4" />
               {!collapsed && "Buyer"}
@@ -81,7 +73,7 @@ export default function DashboardLayout({
 
         {/* Nav Links */}
         <nav className="flex-1 p-3 space-y-1">
-          {links.map((link) => {
+          {buyerLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
@@ -124,7 +116,7 @@ export default function DashboardLayout({
       <main className="flex-1 overflow-x-hidden">
         {/* Mobile Tab Bar */}
         <div className="lg:hidden flex items-center gap-1 px-4 py-3 border-b border-cyber-border overflow-x-auto custom-scrollbar">
-          {links.map((link) => {
+          {mobileLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
@@ -143,7 +135,9 @@ export default function DashboardLayout({
           })}
         </div>
 
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="p-6 lg:p-8">
+          <Suspense fallback={<DashboardContentFallback />}>{children}</Suspense>
+        </div>
       </main>
     </div>
   );

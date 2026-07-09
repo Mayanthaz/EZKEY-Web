@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Search,
   ShoppingCart,
   Bell,
-  User,
   Menu,
   X,
   Gamepad2,
@@ -27,7 +26,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<SupabaseUser | null>(null);
 
-  const supabase = hasEnvVars ? createClient() : null;
+  const supabase = useMemo(() => (hasEnvVars ? createClient() : null), []);
 
   useEffect(() => {
     if (!supabase) {
@@ -49,7 +48,7 @@ export default function Navbar() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -112,7 +111,7 @@ export default function Navbar() {
                                group-focus-within:text-neon-purple transition-colors duration-300" />
               <input
                 type="text"
-                placeholder="Search games, items, keys..."
+                placeholder="Search apps, vouchers, keys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-cyber-card/60 border border-cyber-border rounded-xl
@@ -254,7 +253,7 @@ export default function Navbar() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search games, items, keys..."
+                placeholder="Search apps, vouchers, keys..."
                 className="w-full pl-10 pr-4 py-3 bg-cyber-card/60 border border-cyber-border rounded-xl
                          text-sm text-foreground placeholder:text-muted-foreground/50
                          focus:outline-none focus:border-neon-purple/50"

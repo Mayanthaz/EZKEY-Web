@@ -1,6 +1,6 @@
 "use client";
 
-import { DollarSign, ArrowUpRight, Clock, CheckCircle, Wallet } from "lucide-react";
+import { DollarSign, Clock, Wallet } from "lucide-react";
 
 const payouts = [
   { id: "PAY-001", amount: "$245.50", method: "Stripe", status: "completed", date: "Jul 5, 2026" },

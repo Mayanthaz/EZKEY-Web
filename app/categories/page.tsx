@@ -6,7 +6,7 @@ import { MOCK_CATEGORIES } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Categories",
   description:
-    "Browse all categories on EZKEY — Game Keys, In-Game Items, Gift Cards, Game Coins, Accounts, and Boosting Services.",
+    "Browse all categories on EZKEY — Digital Apps, Vouchers, Digital Keys, Accounts, Digital Credits, and Digital Services.",
 };
 
 export default function CategoriesPage() {
@@ -23,7 +23,7 @@ export default function CategoriesPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_CATEGORIES.map((cat, i) => (
+          {MOCK_CATEGORIES.map((cat) => (
             <Link
               key={cat.slug}
               href={`/categories/${cat.slug}`}

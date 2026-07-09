@@ -16,7 +16,6 @@ import {
 import {
   MOCK_LISTINGS,
   MOCK_CATEGORIES,
-  TRUST_BADGES,
   PLATFORM_LABELS,
 } from "@/lib/constants";
 
@@ -47,7 +46,7 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neon-purple/10 border border-neon-purple/20
                           rounded-full text-sm text-neon-purple mb-8 animate-fade-in">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Trusted by 50,000+ gamers worldwide</span>
+              <span>Trusted by 50,000+ digital buyers and sellers</span>
             </div>
 
             {/* Heading */}
@@ -55,13 +54,13 @@ export default function HomePage() {
                          leading-tight tracking-tight mb-6 animate-slide-up">
               <span className="text-foreground">Your Premium</span>
               <br />
-              <span className="text-gradient">Gaming Marketplace</span>
+              <span className="text-gradient">Digital Marketplace</span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10
                         leading-relaxed animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              Buy and sell game keys, in-game items, gift cards, and digital assets
+              Buy and sell digital apps, vouchers, keys, accounts, and digital assets
               with <span className="text-neon-green font-medium">secure escrow protection</span> and{" "}
               <span className="text-neon-blue font-medium">instant delivery</span>.
             </p>
@@ -76,8 +75,8 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
-              <Link href="/auth/sign-up" className="btn-ghost-neon text-base !px-8 !py-4 group">
-                Start Selling
+              <Link href="/become-a-seller" className="btn-ghost-neon text-base !px-8 !py-4 group">
+                Become a Seller
                 <ChevronRight className="w-4 h-4 inline ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
@@ -185,7 +184,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredListings.map((listing, i) => (
+            {featuredListings.map((listing) => (
               <Link
                 key={listing.id}
                 href={`/marketplace/${listing.slug}`}
@@ -304,7 +303,7 @@ export default function HomePage() {
               How <span className="text-gradient">EZKEY</span> Works
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Three simple steps to buy or sell digital gaming goods securely
+              Three simple steps to buy or sell digital goods securely
             </p>
           </div>
 
@@ -315,7 +314,7 @@ export default function HomePage() {
                 icon: ShoppingBag,
                 title: "Browse & Buy",
                 description:
-                  "Explore thousands of game keys, items, and gift cards from verified sellers. Find the best deals instantly.",
+                  "Explore thousands of digital apps, vouchers, keys, and accounts from verified sellers. Find the best deals instantly.",
                 color: "neon-purple",
               },
               {
@@ -331,7 +330,7 @@ export default function HomePage() {
                 icon: Zap,
                 title: "Instant Delivery",
                 description:
-                  "Receive your game keys or items instantly. Automated delivery for supported products, manual for rare items.",
+                  "Receive your digital keys, vouchers, or account details instantly. Automated delivery for supported products, manual for rare items.",
                 color: "neon-green",
               },
             ].map((item, i) => (
@@ -377,8 +376,8 @@ export default function HomePage() {
               Ready to <span className="text-gradient">Start Trading?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join 50,000+ gamers buying and selling on the most secure gaming
-              marketplace. Sign up free and start in minutes.
+              Join 50,000+ buyers and sellers on a secure digital marketplace.
+              Sign up free and start in minutes.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/sign-up" className="btn-neon text-base !px-8 !py-4 group">

@@ -19,6 +19,12 @@ import {
 } from "lucide-react";
 import { MOCK_LISTINGS, PLATFORM_LABELS } from "@/lib/constants";
 
+export function generateStaticParams() {
+  return MOCK_LISTINGS.map((listing) => ({
+    slug: listing.slug,
+  }));
+}
+
 // Generate metadata dynamically for SEO
 export async function generateMetadata({
   params,

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sign Up",
-  description: "Create your EZKEY account and start buying or selling game keys, in-game items, and digital gaming assets.",
+  description: "Create your EZKEY account and start buying or selling digital apps, vouchers, keys, accounts, and digital assets.",
 };
 
 export default function SignUpPage() {

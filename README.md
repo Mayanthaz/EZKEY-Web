@@ -17,6 +17,82 @@
 </p>
 <br/>
 
+## EZKEY seller KYC
+
+Seller onboarding uses Didit hosted verification for live document scanning,
+liveness, and face matching. EZKEY creates a Didit session from
+`/api/kyc/didit/session`, opens the returned URL in the Didit web SDK modal,
+then records the result from `/api/webhooks/didit` or the callback refresh page.
+
+Required environment variables:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+DIDIT_API_KEY=your-didit-api-key
+DIDIT_WEBHOOK_SECRET=your-didit-webhook-secret
+```
+
+The Didit workflow id is per-session config, not a secret. The current seller
+KYC workflow is configured in `lib/didit.ts`.
+
+Didit console setup:
+
+1. Keep the workflow configured for ID verification, liveness, and face match.
+2. Add the webhook URL: `https://your-domain.com/api/webhooks/didit`.
+3. Use the same webhook secret in Didit and `DIDIT_WEBHOOK_SECRET`.
+4. Run the Supabase migrations, including `004_seller_verifications.sql` and `005_didit_webhook_events.sql`.
+
+Approved Didit sessions update the user profile to `role = seller` and unlock
+`/dashboard/seller`.
+
+### Seller KYC flow
+
+1. The seller fills out the onboarding form at `/become-a-seller`.
+2. `DiditKycButton` posts the form data to `/api/kyc/didit/session`.
+3. The API creates a Didit hosted verification session and returns the session URL.
+4. The browser opens the session URL with `@didit-protocol/sdk-web`, where the user must allow camera access for document capture and liveness.
+5. Didit calls back to `/become-a-seller/kyc-result`, and the status page refreshes the seller verification record from `/api/kyc/didit/status`.
+6. The webhook at `/api/webhooks/didit` keeps Supabase in sync after the final decision.
+
+Implementation notes:
+
+1. Keep the flow on a secure origin. Use `https://` in production and `http://localhost:3000` for local development.
+2. Do not move the camera capture into EZKEY. Didit hosts the scanner and handles the browser permission prompt.
+3. If the redirect returns without query parameters, the result page still loads the latest verification status from the API.
+4. Use the same `DIDIT_WEBHOOK_SECRET` in Didit and in the app environment.
+5. Do not trust the SDK completion callback as proof of approval; it is only a UI signal.
+
+### Access control
+
+The landing page and auth pages are public. Marketplace browsing, category pages,
+listing detail pages, seller onboarding, dashboards, and application APIs require
+a logged-in Supabase user. The Didit webhook receiver remains public so Didit can
+deliver signed server-to-server events.
+
+### Didit webhook endpoint
+
+EZKEY now accepts Didit POST webhooks at `/api/webhooks/didit`.
+
+Implementation details:
+
+1. The endpoint reads the raw body first and validates the `X-Timestamp` header within a 5 minute window.
+2. The endpoint verifies `X-Signature-V2` against Didit's shortened-float, sorted canonical JSON, then `X-Signature` against the exact raw bytes, then the `X-Signature-Simple` fallback using constant-time comparison.
+3. Every accepted event is logged to `didit_webhook_events` with an idempotency key derived from `event_id`, or from the best available resource ID plus `status + webhook_type`; duplicate deliveries return 2xx without reprocessing seller state.
+4. Session-style verification events update `seller_verifications` and keep the seller dashboard state in sync.
+5. Entity, business, activity, and transaction events are accepted and stored for auditing, even when they do not map to a seller verification row.
+
+Environment:
+
+1. Set `DIDIT_WEBHOOK_SECRET` to the destination secret from the Didit Business Console.
+2. Keep the endpoint on HTTPS in production.
+3. If your webhook receiver sits behind Cloudflare, whitelist `18.203.201.92`.
+
+Testing:
+
+1. Use Didit Console > API & Webhooks > Try Webhook to send approved, declined, in-review, KYB, entity, activity, and transaction payloads.
+2. Confirm duplicate deliveries do not create duplicate state changes.
+
 ## Features
 
 - Works across the entire [Next.js](https://nextjs.org) stack
