@@ -1,7 +1,11 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import {
+  type OAuthProvider,
+  useOAuthProviderStatus,
+} from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,10 +21,19 @@ export function SignUpForm({
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const oauthProviderStatus = useOAuthProviderStatus();
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!hasEnvVars) {
+      setError(
+        "Supabase authentication is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to .env.local.",
+      );
+      return;
+    }
+
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -46,14 +59,36 @@ export function SignUpForm({
     }
   };
 
-  const handleOAuthLogin = async (provider: "google" | "discord" | "facebook") => {
+  const getOAuthProviderLabel = (provider: OAuthProvider) => {
+    return provider.charAt(0).toUpperCase() + provider.slice(1);
+  };
+
+  const handleOAuthLogin = async (provider: OAuthProvider) => {
+    if (!hasEnvVars) {
+      setError(
+        "Supabase authentication is not configured. Add your Supabase environment variables first.",
+      );
+      return;
+    }
+
+    if (oauthProviderStatus.isProviderEnabled(provider) === false) {
+      setError(
+        `${getOAuthProviderLabel(provider)} sign-in is not enabled in Supabase yet. Enable the provider in Supabase Authentication > Providers first.`,
+      );
+      return;
+    }
+
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+
+    if (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -75,8 +110,19 @@ export function SignUpForm({
 
         {/* OAuth Buttons */}
         <div className="space-y-3 mb-6">
+          {!hasEnvVars && (
+            <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              Authentication is unavailable until Supabase environment variables are added.
+            </div>
+          )}
+
           <button
             onClick={() => handleOAuthLogin("google")}
+            disabled={
+              !hasEnvVars ||
+              oauthProviderStatus.isLoading ||
+              oauthProviderStatus.isProviderEnabled("google") === false
+            }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-cyber-surface border border-cyber-border
                      rounded-xl text-sm font-medium hover:bg-white/5 hover:border-cyber-border transition-all duration-300"
           >
@@ -91,6 +137,11 @@ export function SignUpForm({
 
           <button
             onClick={() => handleOAuthLogin("discord")}
+            disabled={
+              !hasEnvVars ||
+              oauthProviderStatus.isLoading ||
+              oauthProviderStatus.isProviderEnabled("discord") === false
+            }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#5865F2]/10 border border-[#5865F2]/20
                      rounded-xl text-sm font-medium hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 transition-all duration-300"
           >
@@ -181,7 +232,7 @@ export function SignUpForm({
           <button
             type="submit"
             className="btn-neon w-full !py-3.5"
-            disabled={isLoading}
+            disabled={isLoading || !hasEnvVars}
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               {isLoading ? (
