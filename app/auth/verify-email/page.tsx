@@ -8,21 +8,45 @@ import { Gamepad2, Mail, Loader2, CheckCircle2, RefreshCw } from "lucide-react";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
+  const emailFromParams = searchParams.get("email") || "";
   const router = useRouter();
 
+  const [email, setEmail] = useState(emailFromParams);
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const didInitialFocus = useRef(false);
 
-  // Focus the first input on mount
   useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+    if (emailFromParams) {
+      window.sessionStorage.setItem("ezkey:pending-signup-email", emailFromParams);
+      return;
+    }
+
+    const pendingEmail = window.sessionStorage.getItem("ezkey:pending-signup-email");
+    if (pendingEmail) {
+      setEmail(pendingEmail);
+    }
+  }, [emailFromParams]);
+
+  useEffect(() => {
+    if (didInitialFocus.current) {
+      return;
+    }
+
+    if (email) {
+      inputRefs.current[0]?.focus();
+    } else {
+      emailInputRef.current?.focus();
+    }
+
+    didInitialFocus.current = true;
+  }, [email]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -81,19 +105,28 @@ function VerifyEmailContent() {
   };
 
   const handleVerify = async (code: string) => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError("Enter the email address you used to sign up.");
+      emailInputRef.current?.focus();
+      return;
+    }
+
     setIsVerifying(true);
     setError(null);
 
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.verifyOtp({
-        email,
+        email: trimmedEmail,
         token: code,
         type: "signup",
       });
 
       if (error) throw error;
 
+      window.sessionStorage.removeItem("ezkey:pending-signup-email");
       setSuccess(true);
       // Redirect to dashboard after a brief success animation
       setTimeout(() => {
@@ -112,6 +145,14 @@ function VerifyEmailContent() {
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
 
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError("Enter the email address you used to sign up before resending.");
+      emailInputRef.current?.focus();
+      return;
+    }
+
     setIsResending(true);
     setError(null);
 
@@ -119,7 +160,7 @@ function VerifyEmailContent() {
       const supabase = createClient();
       const { error } = await supabase.auth.resend({
         type: "signup",
-        email,
+        email: trimmedEmail,
       });
 
       if (error) throw error;
@@ -173,9 +214,8 @@ function VerifyEmailContent() {
                 </div>
                 <h1 className="font-display text-2xl font-bold mb-2">Verify Your Email</h1>
                 <p className="text-sm text-muted-foreground">
-                  We&apos;ve sent a 6-digit verification code to
+                  Enter the 6-digit verification code from your email.
                 </p>
-                <p className="text-sm font-medium text-neon-purple mt-1">{email}</p>
               </>
             )}
           </div>
@@ -184,6 +224,25 @@ function VerifyEmailContent() {
             <>
               {/* OTP Input */}
               <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="verify-email" className="text-sm font-medium">
+                    Email address
+                  </label>
+                  <input
+                    id="verify-email"
+                    ref={emailInputRef}
+                    type="email"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setError(null);
+                    }}
+                    placeholder="you@example.com"
+                    disabled={isVerifying}
+                    className="input-neon"
+                  />
+                </div>
+
                 <div className="flex justify-center gap-3">
                   {otp.map((digit, index) => (
                     <input
@@ -217,7 +276,7 @@ function VerifyEmailContent() {
                 <button
                   type="submit"
                   className="btn-neon w-full !py-3.5"
-                  disabled={isVerifying || otp.some((d) => d === "")}
+                  disabled={isVerifying || !email.trim() || otp.some((d) => d === "")}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     {isVerifying ? (

@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -19,10 +20,14 @@ export default function Page() {
               <CardDescription>Check your email to confirm</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 You&apos;ve successfully signed up. Please check your email to
-                confirm your account before signing in.
+                confirm your account before signing in. If your email contains a
+                6-digit code, enter it on the verification page.
               </p>
+              <Link href="/auth/verify-email" className="btn-neon w-full text-center !py-3">
+                <span className="relative z-10">Enter Verification Code</span>
+              </Link>
             </CardContent>
           </Card>
         </div>
