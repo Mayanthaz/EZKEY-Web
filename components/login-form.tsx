@@ -2,6 +2,10 @@
 
 import { cn, hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import {
+  type OAuthProvider,
+  useOAuthProviderStatus,
+} from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +22,7 @@ export function LoginForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [isLoading, setIsLoading] = useState(false);
+  const oauthProviderStatus = useOAuthProviderStatus();
   const router = useRouter();
 
   useEffect(() => {
@@ -69,7 +74,11 @@ export function LoginForm({
     }
   };
 
-  const handleOAuthLogin = async (provider: "google" | "discord" | "facebook") => {
+  const getOAuthProviderLabel = (provider: OAuthProvider) => {
+    return provider.charAt(0).toUpperCase() + provider.slice(1);
+  };
+
+  const handleOAuthLogin = async (provider: OAuthProvider) => {
     if (!hasEnvVars) {
       setError(
         "Supabase authentication is not configured. Add your Supabase environment variables first.",
@@ -77,13 +86,24 @@ export function LoginForm({
       return;
     }
 
+    if (oauthProviderStatus.isProviderEnabled(provider) === false) {
+      setError(
+        `${getOAuthProviderLabel(provider)} sign-in is not enabled in Supabase yet. Enable the provider in Supabase Authentication > Providers first.`,
+      );
+      return;
+    }
+
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
       },
     });
+
+    if (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -119,7 +139,11 @@ export function LoginForm({
 
           <button
             onClick={() => handleOAuthLogin("google")}
-            disabled={!hasEnvVars}
+            disabled={
+              !hasEnvVars ||
+              oauthProviderStatus.isLoading ||
+              oauthProviderStatus.isProviderEnabled("google") === false
+            }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-cyber-surface border border-cyber-border
                      rounded-xl text-sm font-medium hover:bg-white/5 hover:border-cyber-border transition-all duration-300
                      disabled:cursor-not-allowed disabled:opacity-50"
@@ -135,7 +159,11 @@ export function LoginForm({
 
           <button
             onClick={() => handleOAuthLogin("discord")}
-            disabled={!hasEnvVars}
+            disabled={
+              !hasEnvVars ||
+              oauthProviderStatus.isLoading ||
+              oauthProviderStatus.isProviderEnabled("discord") === false
+            }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#5865F2]/10 border border-[#5865F2]/20
                      rounded-xl text-sm font-medium hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 transition-all duration-300
                      disabled:cursor-not-allowed disabled:opacity-50"

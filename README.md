@@ -38,6 +38,23 @@ For hosted Supabase settings, set the Auth Site URL to the deployed app URL, and
 add local/dev callback URLs such as `http://localhost:3000/**` to the redirect
 allow list when testing locally.
 
+## Supabase Google OAuth
+
+Google sign-in requires Supabase and Google Cloud configuration before the
+`Continue with Google` button can work.
+
+1. In Google Cloud, create an OAuth Client ID with application type `Web application`.
+2. Add authorized JavaScript origins for the app, such as `http://localhost:3000`
+   and the production domain.
+3. Add the Supabase callback URL as an authorized redirect URI. Supabase shows
+   this URL on Authentication > Providers > Google, and it follows the shape
+   `https://<project-ref>.supabase.co/auth/v1/callback`.
+4. In Supabase Dashboard, open Authentication > Providers > Google.
+5. Enable Google, then paste the Google Client ID and Client Secret.
+6. In Supabase Authentication > URL Configuration, allow the app callback URLs,
+   including `http://localhost:3000/auth/callback` for local development and the
+   production `/auth/callback` URL.
+
 Required environment variables:
 
 ```env
