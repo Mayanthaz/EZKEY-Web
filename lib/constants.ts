@@ -4,9 +4,9 @@
 
 export const SITE_CONFIG = {
   name: "EZKEY",
-  tagline: "Your Premium Gaming Marketplace",
+  tagline: "Your Premium Digital Marketplace",
   description:
-    "Buy and sell game keys, in-game items, gift cards, and digital gaming assets securely with escrow protection.",
+    "Buy and sell digital apps, vouchers, keys, accounts, and digital assets securely with escrow protection.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   platformFeePercent: 5,
 } as const;
@@ -38,12 +38,12 @@ export const PLATFORM_COLORS: Record<string, string> = {
 };
 
 export const CATEGORY_ICONS: Record<string, string> = {
-  "game-keys": "🎮",
-  "in-game-items": "⚔️",
-  "gift-cards": "🎁",
-  "game-coins": "🪙",
+  "digital-keys": "🔑",
+  "digital-apps": "📱",
+  "vouchers": "🎟️",
+  "digital-credits": "💳",
   "accounts": "👤",
-  "boosting-services": "🚀",
+  "digital-services": "🚀",
 };
 
 export const ORDER_STATUS_CONFIG: Record<
@@ -75,15 +75,15 @@ export const ESCROW_STATUS_CONFIG: Record<
 export const NAV_LINKS = [
   { label: "Marketplace", href: "/marketplace" },
   { label: "Categories", href: "/categories" },
-  { label: "Sell", href: "/dashboard/seller" },
+  { label: "Become a Seller", href: "/become-a-seller" },
 ] as const;
 
 export const FOOTER_LINKS = {
   marketplace: [
     { label: "Browse All", href: "/marketplace" },
-    { label: "Game Keys", href: "/categories/game-keys" },
-    { label: "In-Game Items", href: "/categories/in-game-items" },
-    { label: "Gift Cards", href: "/categories/gift-cards" },
+    { label: "Digital Apps", href: "/categories/digital-apps" },
+    { label: "Vouchers", href: "/categories/vouchers" },
+    { label: "Digital Keys", href: "/categories/digital-keys" },
   ],
   support: [
     { label: "Help Center", href: "/help" },
@@ -126,8 +126,8 @@ export const MOCK_LISTINGS: Array<{
     price: 29.99,
     original_price: 59.99,
     platform: "steam",
-    category_slug: "game-keys",
-    category_name: "Game Keys",
+    category_slug: "digital-keys",
+    category_name: "Digital Keys",
     seller_name: "KeyMaster",
     seller_rating: 4.8,
     seller_avatar: "",
@@ -145,8 +145,8 @@ export const MOCK_LISTINGS: Array<{
     price: 34.99,
     original_price: 39.99,
     platform: "steam",
-    category_slug: "game-keys",
-    category_name: "Game Keys",
+    category_slug: "digital-keys",
+    category_name: "Digital Keys",
     seller_name: "GameVault",
     seller_rating: 4.9,
     seller_avatar: "",
@@ -164,8 +164,8 @@ export const MOCK_LISTINGS: Array<{
     price: 1299.99,
     original_price: null,
     platform: "steam",
-    category_slug: "in-game-items",
-    category_name: "In-Game Items",
+    category_slug: "digital-apps",
+    category_name: "Digital Apps",
     seller_name: "SkinTrader",
     seller_rating: 4.7,
     seller_avatar: "",
@@ -183,8 +183,8 @@ export const MOCK_LISTINGS: Array<{
     price: 46.99,
     original_price: 50.0,
     platform: "steam",
-    category_slug: "gift-cards",
-    category_name: "Gift Cards",
+    category_slug: "vouchers",
+    category_name: "Vouchers",
     seller_name: "CardKing",
     seller_rating: 4.6,
     seller_avatar: "",
@@ -202,8 +202,8 @@ export const MOCK_LISTINGS: Array<{
     price: 14.99,
     original_price: 24.99,
     platform: "steam",
-    category_slug: "game-coins",
-    category_name: "Game Coins",
+    category_slug: "digital-credits",
+    category_name: "Digital Credits",
     seller_name: "CoinMaster",
     seller_rating: 4.5,
     seller_avatar: "",
@@ -221,8 +221,8 @@ export const MOCK_LISTINGS: Array<{
     price: 79.99,
     original_price: 99.99,
     platform: "other",
-    category_slug: "boosting-services",
-    category_name: "Boosting Services",
+    category_slug: "digital-services",
+    category_name: "Digital Services",
     seller_name: "BoostPro",
     seller_rating: 4.9,
     seller_avatar: "",
@@ -240,8 +240,8 @@ export const MOCK_LISTINGS: Array<{
     price: 44.99,
     original_price: 69.99,
     platform: "steam",
-    category_slug: "game-keys",
-    category_name: "Game Keys",
+    category_slug: "digital-keys",
+    category_name: "Digital Keys",
     seller_name: "KeyMaster",
     seller_rating: 4.8,
     seller_avatar: "",
@@ -259,8 +259,8 @@ export const MOCK_LISTINGS: Array<{
     price: 119.99,
     original_price: 179.99,
     platform: "xbox",
-    category_slug: "gift-cards",
-    category_name: "Gift Cards",
+    category_slug: "vouchers",
+    category_name: "Vouchers",
     seller_name: "SubKing",
     seller_rating: 4.7,
     seller_avatar: "",
@@ -274,12 +274,12 @@ export const MOCK_LISTINGS: Array<{
 ];
 
 export const MOCK_CATEGORIES = [
-  { name: "Game Keys", slug: "game-keys", icon: "🎮", count: 12450, description: "Digital game activation keys for all platforms" },
-  { name: "In-Game Items", slug: "in-game-items", icon: "⚔️", count: 8320, description: "Rare skins, weapons, and collectibles" },
-  { name: "Gift Cards", slug: "gift-cards", icon: "🎁", count: 5670, description: "Digital gift cards for gaming platforms" },
-  { name: "Game Coins", slug: "game-coins", icon: "🪙", count: 9100, description: "In-game currency and virtual money" },
-  { name: "Accounts", slug: "accounts", icon: "👤", count: 3240, description: "Premium gaming accounts with progress" },
-  { name: "Boosting Services", slug: "boosting-services", icon: "🚀", count: 1890, description: "Rank boosting and leveling services" },
+  { name: "Digital Keys", slug: "digital-keys", icon: "🔑", count: 12450, description: "Activation keys for apps, software, games, and subscriptions" },
+  { name: "Digital Apps", slug: "digital-apps", icon: "📱", count: 8320, description: "Apps, tools, subscriptions, and digital downloads" },
+  { name: "Vouchers", slug: "vouchers", icon: "🎟️", count: 5670, description: "Digital vouchers, prepaid codes, and wallet credits" },
+  { name: "Digital Credits", slug: "digital-credits", icon: "💳", count: 9100, description: "Wallet credits, top-ups, and virtual balances" },
+  { name: "Accounts", slug: "accounts", icon: "👤", count: 3240, description: "Premium digital accounts and profiles" },
+  { name: "Digital Services", slug: "digital-services", icon: "🚀", count: 1890, description: "Setup, activation, and account support services" },
 ];
 
 export const TRUST_BADGES = [

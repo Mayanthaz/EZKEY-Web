@@ -6,7 +6,7 @@ import { MOCK_CATEGORIES } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Categories",
   description:
-    "Browse all categories on EZKEY — Game Keys, In-Game Items, Gift Cards, Game Coins, Accounts, and Boosting Services.",
+    "Browse all categories on EZKEY — Digital Apps, Vouchers, Digital Keys, Accounts, Digital Credits, and Digital Services.",
 };
 
 export default function CategoriesPage() {

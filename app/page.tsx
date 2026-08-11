@@ -18,6 +18,7 @@ import {
   MOCK_CATEGORIES,
   PLATFORM_LABELS,
 } from "@/lib/constants";
+import MarqueeBanner from "@/components/layout/MarqueeBanner";
 
 export default function HomePage() {
   const featuredListings = MOCK_LISTINGS.filter((l) => l.featured);
@@ -31,36 +32,36 @@ export default function HomePage() {
         {/* Background Effects */}
         <div className="absolute inset-0 bg-cyber-dark">
           {/* Grid */}
-          <div className="absolute inset-0 bg-grid opacity-50" />
+          <div className="absolute inset-0 bg-grid opacity-60" />
           {/* Gradient orbs */}
-          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-neon-purple/10 rounded-full blur-[150px] animate-float" />
-          <div className="absolute bottom-20 right-10 w-[400px] h-[400px] bg-neon-blue/10 rounded-full blur-[120px] animate-float" style={{ animationDelay: "3s" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/5 rounded-full blur-[200px]" />
+          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-neon-purple/[0.07] rounded-full blur-[150px] animate-float" />
+          <div className="absolute bottom-20 right-10 w-[400px] h-[400px] bg-neon-blue/[0.07] rounded-full blur-[120px] animate-float" style={{ animationDelay: "3s" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/[0.03] rounded-full blur-[200px]" />
           {/* Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-cyber-dark/50 via-transparent to-cyber-dark" />
+          <div className="absolute inset-0 bg-gradient-to-b from-cyber-dark/60 via-transparent to-cyber-dark" />
         </div>
 
-        <div className="section-container relative z-10 pt-32 pb-20">
+        <div className="section-container relative z-10 pt-36 pb-20">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neon-purple/10 border border-neon-purple/20
-                          rounded-full text-sm text-neon-purple mb-8 animate-fade-in">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Trusted by 50,000+ gamers worldwide</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/[0.04] border border-white/10
+                          rounded-full text-sm text-muted-foreground mb-8 animate-fade-in">
+              <Sparkles className="w-3.5 h-3.5 text-neon-purple" />
+              <span>Trusted by 50,000+ digital buyers and sellers</span>
             </div>
 
             {/* Heading */}
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black
-                         leading-tight tracking-tight mb-6 animate-slide-up">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold
+                         leading-[1.05] tracking-tight mb-6 animate-slide-up">
               <span className="text-foreground">Your Premium</span>
               <br />
-              <span className="text-gradient">Gaming Marketplace</span>
+              <span className="text-gradient">Digital Marketplace</span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10
                         leading-relaxed animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              Buy and sell game keys, in-game items, gift cards, and digital assets
+              Buy and sell digital apps, vouchers, keys, accounts, and digital assets
               with <span className="text-neon-green font-medium">secure escrow protection</span> and{" "}
               <span className="text-neon-blue font-medium">instant delivery</span>.
             </p>
@@ -75,24 +76,27 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
-              <Link href="/auth/sign-up" className="btn-ghost-neon text-base !px-8 !py-4 group">
-                Start Selling
+              <Link href="/become-a-seller" className="btn-ghost-neon text-base !px-8 !py-4 group">
+                Become a Seller
                 <ChevronRight className="w-4 h-4 inline ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
 
             {/* Stats Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 max-w-3xl mx-auto
-                          animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px max-w-3xl mx-auto rounded-2xl border border-white/[0.06]
+                          bg-white/[0.02] backdrop-blur-sm overflow-hidden animate-fade-in" style={{ animationDelay: "0.4s" }}>
               {[
                 { value: "50K+", label: "Active Users", icon: Users },
                 { value: "120K+", label: "Listings", icon: ShoppingBag },
                 { value: "99.9%", label: "Uptime", icon: Zap },
                 { value: "4.9★", label: "Rating", icon: Star },
               ].map((stat) => (
-                <div key={stat.label} className="text-center group">
+                <div
+                  key={stat.label}
+                  className="text-center group py-5 px-2 hover:bg-white/[0.03] transition-colors duration-300"
+                >
                   <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <stat.icon className="w-4 h-4 text-neon-purple opacity-60" />
+                    <stat.icon className="w-4 h-4 text-neon-purple opacity-70" />
                     <span className="font-display text-2xl sm:text-3xl font-bold text-foreground">
                       {stat.value}
                     </span>
@@ -107,6 +111,11 @@ export default function HomePage() {
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cyber-dark to-transparent" />
       </section>
+
+      {/* ============================================================
+          MARQUEE BANNER
+          ============================================================ */}
+      <MarqueeBanner />
 
       {/* ============================================================
           CATEGORIES SECTION
@@ -303,7 +312,7 @@ export default function HomePage() {
               How <span className="text-gradient">EZKEY</span> Works
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Three simple steps to buy or sell digital gaming goods securely
+              Three simple steps to buy or sell digital goods securely
             </p>
           </div>
 
@@ -314,8 +323,9 @@ export default function HomePage() {
                 icon: ShoppingBag,
                 title: "Browse & Buy",
                 description:
-                  "Explore thousands of game keys, items, and gift cards from verified sellers. Find the best deals instantly.",
-                color: "neon-purple",
+                  "Explore thousands of digital apps, vouchers, keys, and accounts from verified sellers. Find the best deals instantly.",
+                iconWrapClass: "bg-neon-purple/10 border-neon-purple/20",
+                iconClass: "text-neon-purple",
               },
               {
                 step: "02",
@@ -323,29 +333,31 @@ export default function HomePage() {
                 title: "Secure Escrow",
                 description:
                   "Your payment is held securely in escrow. Funds are only released to the seller after you confirm delivery.",
-                color: "neon-blue",
+                iconWrapClass: "bg-neon-blue/10 border-neon-blue/20",
+                iconClass: "text-neon-blue",
               },
               {
                 step: "03",
                 icon: Zap,
                 title: "Instant Delivery",
                 description:
-                  "Receive your game keys or items instantly. Automated delivery for supported products, manual for rare items.",
-                color: "neon-green",
+                  "Receive your digital keys, vouchers, or account details instantly. Automated delivery for supported products, manual for rare items.",
+                iconWrapClass: "bg-neon-green/10 border-neon-green/20",
+                iconClass: "text-neon-green",
               },
             ].map((item, i) => (
               <div key={item.step} className="relative text-center group">
                 {/* Connector line */}
                 {i < 2 && (
-                  <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gradient-to-r from-cyber-border to-transparent" />
+                  <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gradient-to-r from-white/10 to-transparent" />
                 )}
 
                 <div
-                  className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-${item.color}/10 border border-${item.color}/20
-                            flex items-center justify-center transition-all duration-500 group-hover:scale-110
-                            group-hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]`}
+                  className={`w-20 h-20 mx-auto mb-6 rounded-2xl border flex items-center justify-center
+                            transition-all duration-500 group-hover:scale-110
+                            group-hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] ${item.iconWrapClass}`}
                 >
-                  <item.icon className={`w-8 h-8 text-${item.color}`} />
+                  <item.icon className={`w-8 h-8 ${item.iconClass}`} />
                 </div>
 
                 <span className="font-display text-xs text-muted-foreground tracking-widest uppercase mb-2 block">
@@ -366,9 +378,9 @@ export default function HomePage() {
           ============================================================ */}
       <section className="relative py-24 overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/10 via-cyber-dark to-neon-blue/10" />
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-neon-purple/10 rounded-full blur-[150px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/[0.06] via-cyber-dark to-neon-blue/[0.06]" />
+        <div className="absolute inset-0 bg-grid opacity-40" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-neon-purple/[0.08] rounded-full blur-[150px]" />
 
         <div className="section-container relative z-10 text-center">
           <div className="max-w-2xl mx-auto">
@@ -376,8 +388,8 @@ export default function HomePage() {
               Ready to <span className="text-gradient">Start Trading?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join 50,000+ gamers buying and selling on the most secure gaming
-              marketplace. Sign up free and start in minutes.
+              Join 50,000+ buyers and sellers on a secure digital marketplace.
+              Sign up free and start in minutes.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/sign-up" className="btn-neon text-base !px-8 !py-4 group">

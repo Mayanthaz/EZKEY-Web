@@ -1,8 +1,3 @@
-/* ============================================================
-   Google Fonts Import — Must be first
-   ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,49 +10,52 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 263 70% 50%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 263 75% 58%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 191 91% 37%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 189 94% 43%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 263 70% 50%;
-    --chart-1: 263 70% 50%;
-    --chart-2: 191 91% 37%;
+    --ring: 263 75% 58%;
+    --chart-1: 263 75% 58%;
+    --chart-2: 189 94% 43%;
     --chart-3: 142 71% 45%;
     --chart-4: 330 80% 60%;
     --chart-5: 25 95% 53%;
     --radius: 0.75rem;
   }
 
+  /* EZKEY dark theme — true-black, premium/modern surface with the same
+     purple → cyan brand accent language. This is the theme actually
+     used site-wide (see app/layout.tsx: <html class="dark">). */
   .dark {
-    --background: 240 33% 5%;
-    --foreground: 0 0% 95%;
-    --card: 240 33% 8%;
-    --card-foreground: 0 0% 95%;
-    --popover: 240 33% 8%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 263 70% 50%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 20% 12%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 240 20% 12%;
-    --muted-foreground: 240 5% 60%;
-    --accent: 191 91% 37%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 20% 18%;
-    --input: 240 20% 18%;
-    --ring: 263 70% 50%;
-    --chart-1: 263 70% 50%;
-    --chart-2: 191 91% 37%;
+    --background: 240 6% 4%;
+    --foreground: 0 0% 97%;
+    --card: 240 6% 7%;
+    --card-foreground: 0 0% 96%;
+    --popover: 240 7% 7%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 263 75% 63%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 11%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 240 5% 11%;
+    --muted-foreground: 240 4% 63%;
+    --accent: 189 94% 48%;
+    --accent-foreground: 0 0% 6%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 15%;
+    --input: 240 5% 15%;
+    --ring: 263 75% 63%;
+    --chart-1: 263 75% 63%;
+    --chart-2: 189 94% 48%;
     --chart-3: 142 71% 45%;
     --chart-4: 330 80% 60%;
     --chart-5: 25 95% 53%;
@@ -70,10 +68,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-poppins), system-ui, sans-serif;
   }
   h1, h2, h3 {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--font-poppins), system-ui, sans-serif;
   }
 }
 
@@ -81,31 +79,37 @@
    EZKEY Custom Utility Classes
    ============================================================ */
 @layer components {
-  /* Glassmorphism Card */
+  /* Glassmorphism Card — flat black surface, hairline border, soft elevation.
+     Color only shows up on hover/focus, keeping the resting UI calm and premium. */
   .glass-card {
-    @apply bg-cyber-card/60 backdrop-blur-xl border border-cyber-border rounded-xl;
+    @apply bg-cyber-card/70 backdrop-blur-2xl border border-white/[0.06] rounded-2xl;
     box-shadow:
-      0 0 0 1px rgba(139, 92, 246, 0.05),
-      0 4px 24px rgba(0, 0, 0, 0.3);
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.03),
+      0 20px 40px -24px rgba(0, 0, 0, 0.8);
   }
 
   .glass-card:hover {
-    @apply bg-cyber-card-hover/70 border-neon-purple/30;
+    @apply bg-cyber-card-hover/80 border-white/[0.12];
     box-shadow:
-      0 0 0 1px rgba(139, 92, 246, 0.15),
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(139, 92, 246, 0.08);
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 24px 48px -20px rgba(0, 0, 0, 0.85),
+      0 0 0 1px rgba(139, 92, 246, 0.12);
   }
 
-  /* Neon Glow Button */
+  /* Neon Glow Button — tighter, premium glow instead of a heavy blur wash */
   .btn-neon {
-    @apply relative px-6 py-3 font-semibold text-white rounded-lg overflow-hidden transition-all duration-300;
-    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    @apply relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300;
+    background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+    box-shadow:
+      0 8px 24px -8px rgba(139, 92, 246, 0.45),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
   }
 
   .btn-neon:hover {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.5), 0 0 80px rgba(6, 182, 212, 0.2);
+    box-shadow:
+      0 12px 32px -8px rgba(139, 92, 246, 0.55),
+      0 0 32px -6px rgba(34, 211, 238, 0.3),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
     transform: translateY(-2px);
   }
 
@@ -116,18 +120,19 @@
   .btn-neon::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+    background: linear-gradient(135deg, #22d3ee, #8b5cf6);
   }
 
   .btn-neon:hover::before {
     opacity: 1;
   }
 
-  /* Ghost Neon Button */
+  /* Ghost Button — neutral surface + hairline border by default (modern black-UI
+     pattern); brand color only appears on hover so it reads as premium, not loud. */
   .btn-ghost-neon {
-    @apply px-6 py-3 font-semibold text-neon-purple border border-neon-purple/40 rounded-lg
-           transition-all duration-300 hover:bg-neon-purple/10 hover:border-neon-purple/80
-           hover:shadow-[0_0_20px_rgba(139,92,246,0.2)];
+    @apply px-6 py-3 font-semibold text-foreground bg-white/[0.02] border border-white/10 rounded-xl
+           transition-all duration-300 hover:bg-white/[0.06] hover:border-neon-purple/50
+           hover:text-white hover:shadow-[0_0_24px_-4px_rgba(139,92,246,0.35)];
   }
 
   /* Status Badges */
@@ -156,18 +161,18 @@
            bg-neon-purple/10 text-neon-purple border border-neon-purple/20;
   }
 
-  /* Cyber Grid Background */
+  /* Cyber Grid Background — neutral hairline grid, not tinted, for a cleaner black canvas */
   .bg-grid {
     background-image:
-      linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
   /* Gradient Text */
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    background-image: linear-gradient(135deg, #8b5cf6, #22d3ee);
   }
 
   .text-gradient-warm {
@@ -182,9 +187,9 @@
 
   /* Input Neon */
   .input-neon {
-    @apply w-full px-4 py-3 bg-cyber-dark border border-cyber-border rounded-lg
+    @apply w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl
            text-foreground placeholder:text-muted-foreground/50
-           focus:outline-none focus:border-neon-purple/50 focus:ring-1 focus:ring-neon-purple/30
+           focus:outline-none focus:border-neon-purple/60 focus:ring-1 focus:ring-neon-purple/20 focus:bg-white/[0.05]
            transition-all duration-300;
   }
 
@@ -213,7 +218,7 @@
   /* Divider with glow */
   .divider-glow {
     @apply h-px w-full;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   }
 }
 
@@ -225,7 +230,7 @@ html {
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.35);
   color: white;
 }
 
@@ -233,6 +238,6 @@ html {
    Focus visible for accessibility
    ============================================================ */
 :focus-visible {
-  outline: 2px solid hsl(263 70% 50%);
+  outline: 2px solid hsl(263 75% 63%);
   outline-offset: 2px;
 }

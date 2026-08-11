@@ -96,7 +96,7 @@ export default function MarketplaceClient() {
             <span className="text-gradient">Marketplace</span>
           </h1>
           <p className="text-muted-foreground">
-            Discover the best deals on game keys, in-game items, and more
+            Discover the best deals on digital apps, vouchers, keys, accounts, and more
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Search,
   ShoppingCart,
@@ -71,19 +71,19 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-cyber-darker/90 backdrop-blur-xl border-b border-cyber-border shadow-lg shadow-black/20"
-          : "bg-transparent"
+          ? "bg-cyber-darker/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_0_0_rgba(255,255,255,0.04)]"
+          : "bg-gradient-to-b from-cyber-darker/60 via-cyber-darker/10 to-transparent"
       }`}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
             <div className="relative">
-              <Gamepad2 className="w-8 h-8 text-neon-purple transition-all duration-300 group-hover:text-neon-blue" />
+              <Gamepad2 className="w-7 h-7 text-neon-purple transition-all duration-300 group-hover:text-neon-blue" />
               <div className="absolute inset-0 blur-lg bg-neon-purple/30 group-hover:bg-neon-blue/30 transition-all duration-300" />
             </div>
-            <span className="font-display text-xl font-bold text-gradient tracking-wider">
+            <span className="font-display text-lg font-bold text-gradient tracking-tight">
               EZKEY
             </span>
           </Link>
@@ -94,30 +94,30 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground
-                           transition-all duration-300 rounded-lg hover:bg-white/5 relative group"
+                className="px-3.5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground
+                           transition-all duration-300 rounded-lg hover:bg-white/[0.05] relative group"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-neon-purple
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-neon-purple
                                transition-all duration-300 group-hover:w-3/4 rounded-full" />
               </Link>
             ))}
           </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-6">
+          <div className="hidden md:flex flex-1 max-w-sm mx-6">
             <div className="relative w-full group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground
                                group-focus-within:text-neon-purple transition-colors duration-300" />
               <input
                 type="text"
-                placeholder="Search games, items, keys..."
+                placeholder="Search apps, vouchers, keys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-cyber-card/60 border border-cyber-border rounded-xl
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl
                          text-sm text-foreground placeholder:text-muted-foreground/50
                          focus:outline-none focus:border-neon-purple/50 focus:ring-1 focus:ring-neon-purple/20
-                         focus:bg-cyber-card transition-all duration-300"
+                         focus:bg-white/[0.06] transition-all duration-300"
               />
               {searchQuery && (
                 <button
@@ -134,7 +134,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             {/* Cart */}
             <button className="relative p-2.5 rounded-xl text-muted-foreground hover:text-foreground
-                             hover:bg-white/5 transition-all duration-300">
+                             hover:bg-white/[0.05] transition-all duration-300">
               <ShoppingCart className="w-5 h-5" />
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-neon-purple text-[10px] font-bold
                              text-white rounded-full flex items-center justify-center animate-bounce-soft">
@@ -253,7 +253,7 @@ export default function Navbar() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search games, items, keys..."
+                placeholder="Search apps, vouchers, keys..."
                 className="w-full pl-10 pr-4 py-3 bg-cyber-card/60 border border-cyber-border rounded-xl
                          text-sm text-foreground placeholder:text-muted-foreground/50
                          focus:outline-none focus:border-neon-purple/50"

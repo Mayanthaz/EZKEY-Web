@@ -13,13 +13,13 @@ import { FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-cyber-darker border-t border-cyber-border overflow-hidden">
+    <footer className="relative bg-cyber-darker border-t border-white/[0.06] overflow-hidden">
       {/* Background glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neon-purple/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neon-purple/[0.04] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="section-container relative z-10">
         {/* Trust Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-10 border-b border-cyber-border">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-10 border-b border-white/[0.06]">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center shrink-0">
               <Shield className="w-6 h-6 text-neon-purple" />
@@ -154,7 +154,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between py-6 border-t border-cyber-border gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between py-6 border-t border-white/[0.06] gap-4">
           <p className="text-xs text-muted-foreground">
             © <CurrentYear /> EZKEY. All rights reserved.
           </p>

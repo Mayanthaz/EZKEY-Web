@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins, JetBrains_Mono, Orbitron } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ChatbotFab from "@/components/chatbot-fab";
@@ -14,36 +14,36 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "EZKEY — Your Premium Gaming Marketplace",
+    default: "EZKEY — Your Premium Digital Marketplace",
     template: "%s | EZKEY",
   },
   description:
-    "Buy and sell game keys, in-game items, gift cards, and digital gaming assets securely with escrow protection. Instant delivery, buyer protection, 24/7 support.",
+    "Buy and sell digital apps, vouchers, keys, accounts, and digital assets securely with escrow protection. Instant delivery, buyer protection, 24/7 support.",
   keywords: [
-    "game keys",
-    "gaming marketplace",
-    "buy game keys",
-    "sell game keys",
-    "steam keys",
-    "in-game items",
-    "gift cards",
+    "digital apps",
+    "digital marketplace",
+    "buy digital keys",
+    "sell digital keys",
+    "vouchers",
+    "digital accounts",
+    "activation keys",
     "digital marketplace",
     "escrow",
     "EZKEY",
   ],
   openGraph: {
-    title: "EZKEY — Your Premium Gaming Marketplace",
+    title: "EZKEY — Your Premium Digital Marketplace",
     description:
-      "Buy and sell game keys, in-game items, and digital gaming assets securely with escrow protection.",
+      "Buy and sell digital apps, vouchers, keys, accounts, and digital assets securely with escrow protection.",
     type: "website",
     locale: "en_US",
     siteName: "EZKEY",
   },
   twitter: {
     card: "summary_large_image",
-    title: "EZKEY — Your Premium Gaming Marketplace",
+    title: "EZKEY — Your Premium Digital Marketplace",
     description:
-      "Buy and sell game keys, in-game items, and digital gaming assets securely with escrow protection.",
+      "Buy and sell digital apps, vouchers, keys, accounts, and digital assets securely with escrow protection.",
   },
   robots: {
     index: true,
@@ -51,10 +51,25 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   display: "swap",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export default function RootLayout({
@@ -64,20 +79,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body
-        className={`${inter.className} antialiased bg-cyber-dark text-foreground custom-scrollbar`}
+        className={`${poppins.variable} ${orbitron.variable} ${jetBrainsMono.variable} font-sans antialiased bg-cyber-dark text-foreground custom-scrollbar`}
       >
         <Suspense fallback={null}>
           <SupabaseAuthErrorRedirect />

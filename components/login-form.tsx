@@ -8,7 +8,7 @@ import {
 } from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({
@@ -19,9 +19,32 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [isLoading, setIsLoading] = useState(false);
   const oauthProviderStatus = useOAuthProviderStatus();
   const router = useRouter();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirectedFrom = params.get("redirectedFrom");
+    const reason = params.get("reason");
+
+    if (
+      redirectedFrom &&
+      redirectedFrom.startsWith("/") &&
+      !redirectedFrom.startsWith("//")
+    ) {
+      setRedirectPath(redirectedFrom);
+      setNotice("Please log in to continue.");
+    }
+
+    if (reason === "auth-not-configured") {
+      setNotice(
+        "Supabase authentication is not configured yet. Add your Supabase environment variables before logging in.",
+      );
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +66,7 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      router.push("/dashboard");
+      router.push(redirectPath);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -74,7 +97,7 @@ export function LoginForm({
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
       },
     });
 
@@ -96,12 +119,18 @@ export function LoginForm({
           </Link>
           <h1 className="font-display text-2xl font-bold mb-2">Welcome Back</h1>
           <p className="text-sm text-muted-foreground">
-            Log in to your gaming marketplace account
+            Log in to your digital marketplace account
           </p>
         </div>
 
         {/* OAuth Buttons */}
         <div className="space-y-3 mb-6">
+          {notice && (
+            <div className="rounded-lg border border-neon-blue/20 bg-neon-blue/10 px-4 py-3 text-sm text-neon-blue">
+              {notice}
+            </div>
+          )}
+
           {!hasEnvVars && (
             <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
               Authentication is unavailable until Supabase environment variables are added.
@@ -116,7 +145,8 @@ export function LoginForm({
               oauthProviderStatus.isProviderEnabled("google") === false
             }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-cyber-surface border border-cyber-border
-                     rounded-xl text-sm font-medium hover:bg-white/5 hover:border-cyber-border transition-all duration-300"
+                     rounded-xl text-sm font-medium hover:bg-white/5 hover:border-cyber-border transition-all duration-300
+                     disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -135,7 +165,8 @@ export function LoginForm({
               oauthProviderStatus.isProviderEnabled("discord") === false
             }
             className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#5865F2]/10 border border-[#5865F2]/20
-                     rounded-xl text-sm font-medium hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 transition-all duration-300"
+                     rounded-xl text-sm font-medium hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 transition-all duration-300
+                     disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#5865F2">
               <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />

@@ -26,7 +26,7 @@ const stats = [
     color: "neon-orange",
   },
   {
-    label: "Game Keys",
+    label: "Digital Keys",
     value: "18",
     icon: Key,
     color: "neon-green",
@@ -83,7 +83,7 @@ export default function BuyerDashboard() {
       <div>
         <h1 className="font-display text-2xl font-bold">My Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Track your purchases and game keys
+          Track your purchases and digital keys
         </p>
       </div>
 
@@ -166,7 +166,7 @@ export default function BuyerDashboard() {
             Browse Marketplace
           </h3>
           <p className="text-xs text-muted-foreground">
-            Discover new deals and game keys
+            Discover new digital deals and keys
           </p>
         </Link>
 
@@ -179,7 +179,7 @@ export default function BuyerDashboard() {
             <Key className="w-5 h-5 text-neon-green" />
           </div>
           <h3 className="text-sm font-semibold mb-1 group-hover:text-neon-green transition-colors">
-            My Game Keys
+            My Digital Keys
           </h3>
           <p className="text-xs text-muted-foreground">
             View and manage your purchased keys

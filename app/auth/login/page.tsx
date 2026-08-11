@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Log In",
-  description: "Log in to your EZKEY gaming marketplace account.",
+  description: "Log in to your EZKEY digital marketplace account.",
 };
 
 export default function LoginPage() {

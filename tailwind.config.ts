@@ -55,18 +55,18 @@ export default {
         // EZKEY Custom Colors
         neon: {
           purple: "#8b5cf6",
-          blue: "#06b6d4",
+          blue: "#22d3ee",
           green: "#22c55e",
           pink: "#ec4899",
           orange: "#f97316",
         },
         cyber: {
-          dark: "#0a0a1a",
-          darker: "#050510",
-          card: "#111127",
-          "card-hover": "#1a1a3e",
-          border: "#1e1e4a",
-          surface: "#0f0f2a",
+          dark: "#040405",
+          darker: "#000000",
+          card: "#0c0c0f",
+          "card-hover": "#16161b",
+          border: "#1e1e24",
+          surface: "#09090b",
         },
       },
       borderRadius: {
@@ -75,9 +75,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Orbitron", "monospace"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        display: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
       animation: {
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
@@ -93,6 +93,8 @@ export default {
         "bounce-soft": "bounce-soft 2s ease-in-out infinite",
         "gradient-shift": "gradient-shift 8s ease infinite",
         "border-glow": "border-glow 3s ease-in-out infinite",
+        "marquee-left": "marquee-left 32s linear infinite",
+        "marquee-right": "marquee-right 28s linear infinite",
       },
       keyframes: {
         "glow-pulse": {
@@ -143,11 +145,19 @@ export default {
           "0%, 100%": { borderColor: "rgba(139, 92, 246, 0.3)" },
           "50%": { borderColor: "rgba(139, 92, 246, 0.8)" },
         },
+        "marquee-left": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "marquee-right": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
+        },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "cyber-grid":
-          "linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px)",
+          "linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px)",
       },
       backgroundSize: {
         "cyber-grid": "50px 50px",
