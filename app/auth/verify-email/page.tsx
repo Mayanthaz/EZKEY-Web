@@ -2,14 +2,13 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect, Suspense } from "react";
 import { Gamepad2, Mail, Loader2, CheckCircle2, RefreshCw } from "lucide-react";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const emailFromParams = searchParams.get("email") || "";
-  const router = useRouter();
 
   const [email, setEmail] = useState(emailFromParams);
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
@@ -128,9 +127,13 @@ function VerifyEmailContent() {
 
       window.sessionStorage.removeItem("ezkey:pending-signup-email");
       setSuccess(true);
-      // Redirect to dashboard after a brief success animation
+      // Redirect to dashboard after a brief success animation. Use a full
+      // navigation (not router.push) so the browser re-requests the page
+      // with the freshly-issued session cookie instead of potentially
+      // reusing a stale client-router-cache entry from before the user was
+      // authenticated.
       setTimeout(() => {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }, 1500);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Invalid verification code");

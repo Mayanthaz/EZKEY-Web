@@ -7,7 +7,6 @@ import {
   useOAuthProviderStatus,
 } from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -23,7 +22,6 @@ export function LoginForm({
   const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [isLoading, setIsLoading] = useState(false);
   const oauthProviderStatus = useOAuthProviderStatus();
-  const router = useRouter();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -56,20 +54,30 @@ export function LoginForm({
       return;
     }
 
+    const trimmedEmail = email.trim();
+
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: trimmedEmail,
         password,
       });
       if (error) throw error;
-      router.push(redirectPath);
+
+      // Use a full navigation instead of router.push(). Links across the
+      // site prefetch protected routes (e.g. /dashboard) while the user is
+      // signed out, so the client router cache can hold onto the anonymous
+      // "redirect to /auth/login" response for that route. A soft
+      // navigation right after login can replay that stale redirect and
+      // bounce the user straight back to the login page. A hard navigation
+      // guarantees the browser re-requests the page with the fresh session
+      // cookie and no stale cache.
+      window.location.href = redirectPath;
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -195,6 +203,7 @@ export function LoginForm({
                 type="email"
                 placeholder="you@example.com"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-neon !pl-11"
@@ -220,6 +229,7 @@ export function LoginForm({
                 id="password"
                 type={showPassword ? "text" : "password"}
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-neon !pl-11 !pr-11"
