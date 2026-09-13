@@ -1,23 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useMemo } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Search,
   ShoppingCart,
   Bell,
   Menu,
   X,
-  Gamepad2,
   LogOut,
   LayoutDashboard,
   ChevronDown,
   Zap,
+  Package,
+  Settings,
+  KeyRound,
 } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { hasEnvVars } from "@/lib/utils";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import BrandMark from "@/components/layout/BrandMark";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,12 +30,14 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<SupabaseUser | null>(null);
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchRef = useRef<HTMLInputElement>(null);
+
   const supabase = useMemo(() => (hasEnvVars ? createClient() : null), []);
 
   useEffect(() => {
-    if (!supabase) {
-      return;
-    }
+    if (!supabase) return;
 
     const getUser = async () => {
       const {
@@ -51,118 +57,171 @@ export default function Navbar() {
   }, [supabase]);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSignOut = async () => {
-    if (!supabase) {
-      return;
-    }
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsProfileOpen(false);
+  }, [pathname]);
 
+  // ⌘K / Ctrl+K focuses the global search.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (e.key === "Escape") {
+        setIsProfileOpen(false);
+        searchRef.current?.blur();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const handleSignOut = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
     setUser(null);
     setIsProfileOpen(false);
     window.location.href = "/";
   };
 
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    router.push(q ? `/marketplace?q=${encodeURIComponent(q)}` : "/marketplace");
+    setSearchQuery("");
+    setIsMenuOpen(false);
+  };
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname?.startsWith(href);
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-cyber-darker/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_0_0_rgba(255,255,255,0.04)]"
-          : "bg-gradient-to-b from-cyber-darker/60 via-cyber-darker/10 to-transparent"
+          ? "bg-cyber-darker/85 backdrop-blur-2xl border-b border-white/[0.07]"
+          : "bg-gradient-to-b from-cyber-darker/70 via-cyber-darker/15 to-transparent border-b border-transparent"
       }`}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between h-16 lg:h-18">
+        <div className="flex items-center justify-between h-16 lg:h-[68px] gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="relative">
-              <Gamepad2 className="w-7 h-7 text-neon-purple transition-all duration-300 group-hover:text-neon-blue" />
-              <div className="absolute inset-0 blur-lg bg-neon-purple/30 group-hover:bg-neon-blue/30 transition-all duration-300" />
-            </div>
-            <span className="font-display text-lg font-bold text-gradient tracking-tight">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 group shrink-0 rounded-lg"
+            aria-label="EZKEY home"
+          >
+            <BrandMark className="w-8 h-8" />
+            <span className="font-display text-lg font-extrabold text-gradient tracking-tight">
               EZKEY
             </span>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3.5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground
-                           transition-all duration-300 rounded-lg hover:bg-white/[0.05] relative group"
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className={`px-3 py-1.5 text-sm font-medium relative rounded-lg transition-colors duration-200 ${
+                  isActive(link.href)
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {link.label}
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-neon-purple
-                               transition-all duration-300 group-hover:w-3/4 rounded-full" />
+                <span
+                  className={`absolute -bottom-px left-2 right-2 h-px rounded-full transition-all duration-300 ${
+                    isActive(link.href)
+                      ? "bg-gradient-to-r from-neon-purple to-neon-blue opacity-100"
+                      : "bg-white/20 opacity-0 group-hover:opacity-100"
+                  }`}
+                />
               </Link>
             ))}
           </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-6">
-            <div className="relative w-full group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground
-                               group-focus-within:text-neon-purple transition-colors duration-300" />
+          <form
+            onSubmit={submitSearch}
+            className="hidden md:block flex-1 max-w-sm mx-2"
+            role="search"
+          >
+            <div className="relative group">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground
+                           group-focus-within:text-neon-purple transition-colors pointer-events-none"
+              />
               <input
-                type="text"
+                ref={searchRef}
+                type="search"
                 placeholder="Search apps, vouchers, keys..."
+                aria-label="Search marketplace"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl
+                className="w-full pl-9 pr-14 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg
                          text-sm text-foreground placeholder:text-muted-foreground/50
-                         focus:outline-none focus:border-neon-purple/50 focus:ring-1 focus:ring-neon-purple/20
-                         focus:bg-white/[0.06] transition-all duration-300"
+                         focus:outline-none focus:border-neon-purple/50 focus:ring-4 focus:ring-neon-purple/10
+                         focus:bg-white/[0.06] transition-all [&::-webkit-search-cancel-button]:hidden"
               />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  <X className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
-                </button>
-              )}
+              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 hidden lg:inline-flex items-center gap-0.5
+                              px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.04]
+                              font-mono text-[10px] text-muted-foreground/70 pointer-events-none">
+                ⌘K
+              </kbd>
             </div>
-          </div>
+          </form>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2">
-            {/* Cart */}
-            <button className="relative p-2.5 rounded-xl text-muted-foreground hover:text-foreground
-                             hover:bg-white/[0.05] transition-all duration-300">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-neon-purple text-[10px] font-bold
-                             text-white rounded-full flex items-center justify-center animate-bounce-soft">
-                0
-              </span>
-            </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <Link
+              href="/dashboard/buyer/cart"
+              className="relative btn-icon-ghost w-9 h-9"
+              aria-label="Cart"
+            >
+              <ShoppingCart className="w-[18px] h-[18px]" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-neon-purple" />
+            </Link>
 
             {user ? (
               <>
-                {/* Notifications */}
-                <button className="relative p-2.5 rounded-xl text-muted-foreground hover:text-foreground
-                                 hover:bg-white/5 transition-all duration-300">
-                  <Bell className="w-5 h-5" />
+                <button
+                  className="btn-icon-ghost relative w-9 h-9"
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-[18px] h-[18px]" />
                 </button>
 
                 {/* Profile Dropdown */}
                 <div className="relative">
                   <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 p-1.5 pl-2 rounded-xl hover:bg-white/5
-                             transition-all duration-300 border border-transparent hover:border-cyber-border"
+                    onClick={() => setIsProfileOpen((v) => !v)}
+                    aria-expanded={isProfileOpen}
+                    aria-haspopup="menu"
+                    className={`flex items-center gap-2 p-1 pr-2 rounded-lg transition-all duration-200 border ${
+                      isProfileOpen
+                        ? "bg-white/[0.06] border-white/10"
+                        : "border-transparent hover:bg-white/[0.05]"
+                    }`}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue
-                                  flex items-center justify-center text-white text-sm font-bold">
+                    <div
+                      className="w-7 h-7 rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue
+                                 flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    >
                       {user.email?.[0]?.toUpperCase() || "U"}
                     </div>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-300 hidden sm:block ${
+                      className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 hidden sm:block ${
                         isProfileOpen ? "rotate-180" : ""
                       }`}
                     />
@@ -173,35 +232,44 @@ export default function Navbar() {
                       <div
                         className="fixed inset-0 z-40"
                         onClick={() => setIsProfileOpen(false)}
+                        aria-hidden="true"
                       />
-                      <div className="absolute right-0 mt-2 w-56 z-50 glass-card p-2 animate-slide-down">
-                        <div className="px-3 py-2 border-b border-cyber-border mb-1">
-                          <p className="text-sm font-medium truncate">{user.email}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Free Account</p>
+                      <div
+                        role="menu"
+                        className="absolute right-0 mt-2 w-60 z-50 glass-card p-1.5 animate-slide-down"
+                      >
+                        <div className="px-3 py-2.5 mb-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                          <p className="text-sm font-medium truncate">
+                            {user.email}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Free Account
+                          </p>
                         </div>
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground
-                                   hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          Dashboard
-                        </Link>
-                        <Link
-                          href="/dashboard/buyer/orders"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground
-                                   hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          My Orders
-                        </Link>
-                        <div className="divider-glow my-1" />
+                        {[
+                          { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+                          { href: "/dashboard/buyer/orders", label: "My Orders", icon: Package },
+                          { href: "/dashboard/buyer/keys", label: "My Keys", icon: KeyRound },
+                          { href: "/dashboard/buyer/settings", label: "Settings", icon: Settings },
+                        ].map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            role="menuitem"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground
+                                       hover:text-foreground hover:bg-white/[0.05] rounded-lg transition-colors"
+                          >
+                            <item.icon className="w-4 h-4" />
+                            {item.label}
+                          </Link>
+                        ))}
+                        <div className="divider-glow my-1.5" />
                         <button
                           onClick={handleSignOut}
-                          className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-red-400
-                                   hover:bg-red-500/10 rounded-lg transition-all"
+                          role="menuitem"
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm text-red-400
+                                   hover:bg-red-500/10 rounded-lg transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign Out
@@ -212,18 +280,15 @@ export default function Navbar() {
                 </div>
               </>
             ) : (
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1.5">
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground
-                           hover:text-foreground transition-all duration-300"
+                  className="px-3 py-2 text-sm font-medium text-muted-foreground
+                           hover:text-foreground transition-colors"
                 >
                   Log In
                 </Link>
-                <Link
-                  href="/auth/sign-up"
-                  className="btn-neon text-sm !px-5 !py-2"
-                >
+                <Link href="/auth/sign-up" className="btn-neon text-sm !px-4 !py-2">
                   <span className="relative z-10 flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5" />
                     Sign Up
@@ -234,9 +299,10 @@ export default function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl text-muted-foreground hover:text-foreground
-                       hover:bg-white/5 transition-all duration-300"
+              onClick={() => setIsMenuOpen((v) => !v)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              className="lg:hidden btn-icon-ghost w-9 h-9"
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -246,46 +312,82 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-cyber-darker/95 backdrop-blur-xl border-t border-cyber-border animate-slide-down">
-          <div className="section-container py-4 space-y-2">
+        <div className="lg:hidden bg-cyber-darker/95 backdrop-blur-2xl border-t border-white/[0.07] animate-slide-down">
+          <div className="section-container py-4 space-y-1.5">
             {/* Mobile Search */}
-            <div className="relative mb-4 md:hidden">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <form onSubmit={submitSearch} className="relative mb-3 md:hidden" role="search">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
-                type="text"
+                type="search"
                 placeholder="Search apps, vouchers, keys..."
-                className="w-full pl-10 pr-4 py-3 bg-cyber-card/60 border border-cyber-border rounded-xl
+                aria-label="Search marketplace"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg
                          text-sm text-foreground placeholder:text-muted-foreground/50
-                         focus:outline-none focus:border-neon-purple/50"
+                         focus:outline-none focus:border-neon-purple/50 [&::-webkit-search-cancel-button]:hidden"
               />
-            </div>
+            </form>
 
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block px-4 py-3 text-sm font-medium text-muted-foreground
-                         hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
+                className={`flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                  isActive(link.href)
+                    ? "text-foreground bg-white/[0.05]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+                }`}
               >
                 {link.label}
+                {isActive(link.href) && (
+                  <span className="w-1 h-1 rounded-full bg-neon-purple" />
+                )}
               </Link>
             ))}
 
-            {!user && (
-              <div className="flex gap-2 pt-2 border-t border-cyber-border">
+            {user ? (
+              <div className="pt-2 mt-2 space-y-1 border-t border-white/[0.07]">
+                {[
+                  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+                  { href: "/dashboard/buyer/orders", label: "My Orders", icon: Package },
+                  { href: "/dashboard/buyer/settings", label: "Settings", icon: Settings },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground
+                             hover:text-foreground hover:bg-white/[0.04] rounded-lg transition-colors"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                ))}
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-red-400
+                           hover:bg-red-500/10 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2 pt-3 mt-2 border-t border-white/[0.07]">
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex-1 py-3 text-center text-sm font-medium text-muted-foreground
-                           hover:text-foreground border border-cyber-border rounded-lg transition-all"
+                  className="flex-1 py-2.5 text-center text-sm font-medium text-muted-foreground
+                           hover:text-foreground border border-white/10 rounded-lg transition-colors"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/auth/sign-up"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex-1 btn-neon text-center text-sm !py-3"
+                  className="flex-1 btn-neon text-center text-sm !py-2.5"
                 >
                   <span className="relative z-10">Sign Up</span>
                 </Link>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  Gamepad2,
   Zap,
   Shield,
   Star,
@@ -12,6 +11,7 @@ import {
   Users,
   ShoppingBag,
   BadgeCheck,
+  Gamepad2,
 } from "lucide-react";
 import {
   MOCK_LISTINGS,
@@ -19,6 +19,8 @@ import {
   PLATFORM_LABELS,
 } from "@/lib/constants";
 import MarqueeBanner from "@/components/layout/MarqueeBanner";
+import ListingCard from "@/components/catalog/ListingCard";
+import CategoryIcon from "@/components/catalog/CategoryIcon";
 
 export default function HomePage() {
   const featuredListings = MOCK_LISTINGS.filter((l) => l.featured);
