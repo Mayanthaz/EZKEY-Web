@@ -3,8 +3,6 @@ import { Clock3, Gamepad2, Star, Zap } from "lucide-react";
 import { PLATFORM_LABELS } from "@/lib/constants";
 import { cn, formatUsd } from "@/lib/utils";
 
-import type { ComponentProps } from "react";
-
 type DeliveryVariant = "instant" | "manual" | "service" | string;
 
 export type ListingCardListing = {

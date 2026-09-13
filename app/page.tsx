@@ -19,8 +19,6 @@ import {
   PLATFORM_LABELS,
 } from "@/lib/constants";
 import MarqueeBanner from "@/components/layout/MarqueeBanner";
-import ListingCard from "@/components/catalog/ListingCard";
-import CategoryIcon from "@/components/catalog/CategoryIcon";
 
 export default function HomePage() {
   const featuredListings = MOCK_LISTINGS.filter((l) => l.featured);
