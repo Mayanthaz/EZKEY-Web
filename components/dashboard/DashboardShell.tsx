@@ -183,7 +183,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
 
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+          {children}
+        </div>
       </main>
     </div>
   );
