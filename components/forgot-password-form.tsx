@@ -3,17 +3,12 @@
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import { useState } from "react";
+import { Gamepad2, Mail, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 
 export function ForgotPasswordForm({
   className,
@@ -31,7 +26,6 @@ export function ForgotPasswordForm({
     setError(null);
 
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       });
@@ -45,61 +39,96 @@ export function ForgotPasswordForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+    <div className={cn("w-full", className)} {...props}>
+      <div className="glass-card p-8 animate-scale-in">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
+            <Gamepad2 className="w-8 h-8 text-neon-purple transition-all group-hover:text-neon-blue" />
+            <span className="font-display text-xl font-bold text-gradient tracking-wider">
+              EZKEY
+            </span>
+          </Link>
+          <h1 className="font-display text-2xl font-bold mb-2">
+            {success ? "Check Your Email" : "Reset Password"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {success
+              ? "We sent you a password reset link"
+              : "Enter your email to receive a reset link"}
+          </p>
+        </div>
+
+        {success ? (
+          <div className="space-y-4">
+            <Alert className="border-neon-green/20 bg-neon-green/10 text-neon-green [&>svg]:text-neon-green">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertDescription>
+                If you registered using your email and password, you will receive a
+                password reset email. Check your inbox.
+              </AlertDescription>
+            </Alert>
+            <Button asChild variant="outline" className="w-full border-white/10 hover:bg-white/5 gap-2">
+              <Link href="/auth/login">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Login
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-11 bg-white/[0.03] border-white/10 focus:border-neon-purple/60 focus-visible:ring-neon-purple/20 text-foreground placeholder:text-muted-foreground/50"
+                />
+              </div>
+            </div>
+
+            {error && (
+              <Alert variant="destructive" className="border-red-500/30 bg-red-500/10">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-red-400">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              className="btn-neon w-full !py-3.5 border-0"
+              disabled={isLoading}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Reset Email"
+                )}
+              </span>
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              Remember your password?{" "}
+              <Link
+                href="/auth/login"
+                className="text-neon-purple hover:text-neon-blue transition-colors font-medium"
+              >
+                Log in
+              </Link>
             </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+          </form>
+        )}
+      </div>
     </div>
   );
 }

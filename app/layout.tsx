@@ -4,6 +4,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ChatbotFab from "@/components/chatbot-fab";
 import SupabaseAuthErrorRedirect from "@/components/auth/SupabaseAuthErrorRedirect";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import "./globals.css";
 
@@ -85,10 +87,13 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <SupabaseAuthErrorRedirect />
         </Suspense>
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
-        <ChatbotFab />
+        <TooltipProvider>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+          <ChatbotFab />
+          <Toaster richColors theme="dark" />
+        </TooltipProvider>
       </body>
     </html>
   );

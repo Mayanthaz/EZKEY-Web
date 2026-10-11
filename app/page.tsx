@@ -19,6 +19,10 @@ import {
   PLATFORM_LABELS,
 } from "@/lib/constants";
 import MarqueeBanner from "@/components/layout/MarqueeBanner";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function HomePage() {
   const featuredListings = MOCK_LISTINGS.filter((l) => l.featured);
@@ -44,10 +48,14 @@ export default function HomePage() {
         <div className="section-container relative z-10 pt-36 pb-20">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/[0.04] border border-white/10
-                          rounded-full text-sm text-muted-foreground mb-8 animate-fade-in">
-              <Sparkles className="w-3.5 h-3.5 text-neon-purple" />
-              <span>Trusted by 50,000+ digital buyers and sellers</span>
+            <div className="inline-flex items-center gap-2 mb-8 animate-fade-in">
+              <Badge
+                variant="outline"
+                className="px-4 py-1.5 bg-white/[0.04] border-white/10 text-muted-foreground rounded-full text-sm font-normal gap-2"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-neon-purple" />
+                Trusted by 50,000+ digital buyers and sellers
+              </Badge>
             </div>
 
             {/* Heading */}
@@ -69,17 +77,21 @@ export default function HomePage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16
                           animate-slide-up" style={{ animationDelay: "0.2s" }}>
-              <Link href="/marketplace" className="btn-neon text-base !px-8 !py-4 group">
-                <span className="relative z-10 flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  Browse Marketplace
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Link>
-              <Link href="/become-a-seller" className="btn-ghost-neon text-base !px-8 !py-4 group">
-                Become a Seller
-                <ChevronRight className="w-4 h-4 inline ml-1 transition-transform group-hover:translate-x-1" />
-              </Link>
+              <Button asChild className="btn-neon border-0 text-base !px-8 !py-4 group h-auto">
+                <Link href="/marketplace">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5" />
+                    Browse Marketplace
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="btn-ghost-neon border-white/10 text-base !px-8 !py-4 h-auto group">
+                <Link href="/become-a-seller">
+                  Become a Seller
+                  <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
             </div>
 
             {/* Stats Bar */}
@@ -131,14 +143,12 @@ export default function HomePage() {
                 Find exactly what you&apos;re looking for
               </p>
             </div>
-            <Link
-              href="/categories"
-              className="hidden sm:flex items-center gap-1 text-sm text-neon-purple hover:text-neon-blue
-                       transition-colors group"
-            >
-              View All
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <Button variant="ghost" asChild className="hidden sm:flex items-center gap-1 text-sm text-neon-purple hover:text-neon-blue hover:bg-transparent group">
+              <Link href="/categories">
+                View All
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -176,20 +186,20 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-neon-orange" />
-                <span className="text-sm text-neon-orange font-medium">Hot Right Now</span>
+                <Badge variant="outline" className="text-neon-orange border-neon-orange/30 bg-neon-orange/10 text-xs">
+                  Hot Right Now
+                </Badge>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl font-bold">
                 Featured <span className="text-gradient">Deals</span>
               </h2>
             </div>
-            <Link
-              href="/marketplace"
-              className="hidden sm:flex items-center gap-1 text-sm text-neon-purple hover:text-neon-blue
-                       transition-colors group"
-            >
-              See All Deals
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <Button variant="ghost" asChild className="hidden sm:flex items-center gap-1 text-sm text-neon-purple hover:text-neon-blue hover:bg-transparent group">
+              <Link href="/marketplace">
+                See All Deals
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -206,25 +216,31 @@ export default function HomePage() {
                   </div>
                   {/* Discount badge */}
                   {listing.original_price && (
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-neon-green/90 text-black text-xs font-bold rounded-md">
+                    <Badge className="absolute top-3 left-3 bg-neon-green/90 text-black text-xs font-bold hover:bg-neon-green/90">
                       -{Math.round((1 - listing.price / listing.original_price) * 100)}%
-                    </div>
+                    </Badge>
                   )}
                   {/* Platform badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm text-xs font-medium rounded-md border border-white/10">
+                  <Badge
+                    variant="outline"
+                    className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-xs font-medium border-white/10 text-foreground"
+                  >
                     {PLATFORM_LABELS[listing.platform] || listing.platform}
-                  </div>
+                  </Badge>
                   {/* Delivery type */}
                   {listing.delivery_type === "instant" && (
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 bg-neon-blue/20 border border-neon-blue/30 text-neon-blue text-xs font-medium rounded-md">
+                    <Badge
+                      variant="outline"
+                      className="absolute bottom-3 left-3 bg-neon-blue/20 border-neon-blue/30 text-neon-blue text-xs gap-1"
+                    >
                       <Zap className="w-3 h-3" />
                       Instant
-                    </div>
+                    </Badge>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
+                <CardContent className="p-4">
                   <p className="text-xs text-neon-purple font-medium mb-1">
                     {listing.category_name}
                   </p>
@@ -235,12 +251,13 @@ export default function HomePage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {listing.tags.slice(0, 2).map((tag) => (
-                      <span
+                      <Badge
                         key={tag}
-                        className="px-2 py-0.5 text-[10px] bg-cyber-surface border border-cyber-border rounded-md text-muted-foreground"
+                        variant="outline"
+                        className="px-2 py-0.5 text-[10px] bg-cyber-surface border-cyber-border text-muted-foreground rounded-md"
                       >
                         {tag}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
 
@@ -264,7 +281,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Divider */}
-                  <div className="divider-glow mb-3" />
+                  <Separator className="mb-3 bg-white/[0.06]" />
 
                   {/* Price & Sales */}
                   <div className="flex items-end justify-between">
@@ -282,22 +299,21 @@ export default function HomePage() {
                       {listing.sold_count.toLocaleString()} sold
                     </span>
                   </div>
-                </div>
+                </CardContent>
               </Link>
             ))}
           </div>
 
           {/* Mobile CTA */}
           <div className="sm:hidden mt-8 text-center">
-            <Link
-              href="/marketplace"
-              className="btn-neon inline-flex items-center gap-2 text-sm"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                View All Deals
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
+            <Button asChild className="btn-neon border-0 inline-flex items-center gap-2 text-sm">
+              <Link href="/marketplace">
+                <span className="relative z-10 flex items-center gap-2">
+                  View All Deals
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -341,7 +357,7 @@ export default function HomePage() {
                 icon: Zap,
                 title: "Instant Delivery",
                 description:
-                  "Receive your digital keys, vouchers, or account details instantly. Automated delivery for supported products, manual for rare items.",
+                  "Receive your digital keys, vouchers, or account details instantly. Automated delivery for supported products.",
                 iconWrapClass: "bg-neon-green/10 border-neon-green/20",
                 iconClass: "text-neon-green",
               },
@@ -360,9 +376,9 @@ export default function HomePage() {
                   <item.icon className={`w-8 h-8 ${item.iconClass}`} />
                 </div>
 
-                <span className="font-display text-xs text-muted-foreground tracking-widest uppercase mb-2 block">
+                <Badge variant="outline" className="text-muted-foreground border-white/10 bg-transparent text-xs tracking-widest uppercase mb-3">
                   Step {item.step}
-                </span>
+                </Badge>
                 <h3 className="font-display text-lg font-bold mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {item.description}
@@ -392,16 +408,20 @@ export default function HomePage() {
               Sign up free and start in minutes.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth/sign-up" className="btn-neon text-base !px-8 !py-4 group">
-                <span className="relative z-10 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  Create Free Account
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Link>
-              <Link href="/marketplace" className="btn-ghost-neon text-base !px-8 !py-4">
-                Explore Marketplace
-              </Link>
+              <Button asChild className="btn-neon border-0 text-base !px-8 !py-4 h-auto group">
+                <Link href="/auth/sign-up">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    Create Free Account
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="btn-ghost-neon border-white/10 text-base !px-8 !py-4 h-auto">
+                <Link href="/marketplace">
+                  Explore Marketplace
+                </Link>
+              </Button>
             </div>
 
             {/* Trust indicators */}
@@ -410,10 +430,12 @@ export default function HomePage() {
                 <Shield className="w-3.5 h-3.5 text-neon-green" />
                 256-bit SSL Encryption
               </span>
+              <Separator orientation="vertical" className="h-3 bg-white/[0.1]" />
               <span className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-neon-blue" />
                 24/7 Live Support
               </span>
+              <Separator orientation="vertical" className="h-3 bg-white/[0.1]" />
               <span className="flex items-center gap-1.5">
                 <BadgeCheck className="w-3.5 h-3.5 text-neon-purple" />
                 Verified Sellers

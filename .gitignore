@@ -72,3 +72,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# AI & IDE local settings
+.claude/
+
+# Backend build artifacts
+backend/target/
+

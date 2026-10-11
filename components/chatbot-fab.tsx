@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bot, Send, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 const SUPPORT_EMAIL = "ezkeysupport@gmail.com";
 
@@ -56,44 +59,56 @@ export default function ChatbotFab() {
   return (
     <div ref={panelRef} className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
       {isOpen && (
-        <div className="glass-card absolute bottom-16 right-0 w-72 origin-bottom-right animate-scale-in p-4 sm:w-80">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Contact Support</p>
-            <button
+        <div className="glass-card absolute bottom-16 right-0 w-72 origin-bottom-right animate-scale-in sm:w-80 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-neon-blue/20 flex items-center justify-center">
+                <Bot className="w-4 h-4 text-neon-blue" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">Contact Support</p>
+            </div>
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => setIsOpen(false)}
               aria-label="Close support form"
-              className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+              className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-white/[0.06] rounded-lg"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
-          <p className="mb-3 text-xs text-muted-foreground">
-            Tell us what&apos;s wrong. We&apos;ll open Gmail to{" "}
-            <span className="text-neon-blue">{SUPPORT_EMAIL}</span> with your
-            problem as the subject.
-          </p>
-          <form onSubmit={handleSend} className="space-y-3">
-            <input
-              ref={inputRef}
-              type="text"
-              value={problem}
-              onChange={(e) => setProblem(e.target.value)}
-              placeholder="Describe your problem..."
-              maxLength={150}
-              className="input-neon !py-2.5 text-sm"
-            />
-            <button
-              type="submit"
-              disabled={!problem.trim()}
-              className="btn-neon flex w-full items-center justify-center gap-2 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <Send className="h-3.5 w-3.5" />
-                Send via Gmail
-              </span>
-            </button>
-          </form>
+
+          {/* Body */}
+          <div className="p-4">
+            <p className="mb-4 text-xs text-muted-foreground leading-relaxed">
+              Tell us what&apos;s wrong. We&apos;ll open Gmail to{" "}
+              <span className="text-neon-blue font-medium">{SUPPORT_EMAIL}</span> with your
+              problem as the subject.
+            </p>
+            <form onSubmit={handleSend} className="space-y-3">
+              <Input
+                ref={inputRef}
+                type="text"
+                value={problem}
+                onChange={(e) => setProblem(e.target.value)}
+                placeholder="Describe your problem..."
+                maxLength={150}
+                className="bg-white/[0.03] border-white/10 focus:border-neon-purple/60 focus-visible:ring-neon-purple/20 text-foreground placeholder:text-muted-foreground/50 text-sm"
+              />
+              <Button
+                type="submit"
+                disabled={!problem.trim()}
+                className="btn-neon border-0 w-full !py-2.5 text-sm"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <Send className="h-3.5 w-3.5" />
+                  Send via Gmail
+                </span>
+              </Button>
+            </form>
+          </div>
         </div>
       )}
 
