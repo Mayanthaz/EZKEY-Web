@@ -1,7 +1,7 @@
 "use client";
 
 import { DiditSdk } from "@didit-protocol/sdk-web";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -64,15 +64,64 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
       return;
     }
 
-    if (!form.reportValidity()) {
+    const formData = new FormData(form);
+    const legalName = value(formData, "legal_name");
+    const email = value(formData, "email");
+    const country = value(formData, "country");
+    const storeName = value(formData, "store_name");
+    const productCategories = values(formData, "product_categories");
+    const dateOfBirth = value(formData, "date_of_birth");
+    const deliveryPlan = value(formData, "delivery_plan");
+    const payoutCountry = value(formData, "payout_country");
+    const accountHolderName = value(formData, "account_holder_name");
+    const sellerRules = values(formData, "seller_rules");
+    const totalRulesCount = form.querySelectorAll<HTMLInputElement>(
+      'input[name="seller_rules"]'
+    ).length;
+    const kycConsent = checkboxChecked(formData, "kyc_consent");
+
+    if (!legalName) {
+      setError("Please enter your legal name (Step 1).");
       return;
     }
-
-    const formData = new FormData(form);
-    const productCategories = values(formData, "product_categories");
-
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid seller email (Step 1).");
+      return;
+    }
+    if (!country) {
+      setError("Please enter your country / jurisdiction (Step 1).");
+      return;
+    }
+    if (!storeName) {
+      setError("Please enter your public store name (Step 1).");
+      return;
+    }
     if (productCategories.length === 0) {
-      setError("Choose at least one product category you plan to sell.");
+      setError("Choose at least one product category (Step 1).");
+      return;
+    }
+    if (!dateOfBirth) {
+      setError("Please enter your date of birth (Step 2).");
+      return;
+    }
+    if (!deliveryPlan) {
+      setError("Please provide your delivery fulfillment plan (Step 2).");
+      return;
+    }
+    if (!payoutCountry) {
+      setError("Please enter your payout country (Step 3).");
+      return;
+    }
+    if (!accountHolderName) {
+      setError("Please enter your account holder name (Step 3).");
+      return;
+    }
+    if (sellerRules.length < totalRulesCount) {
+      setError("Please accept all 6 seller policies before continuing (Step 3).");
+      return;
+    }
+    if (!kycConsent) {
+      setError("Please agree to the KYC identity verification consent (Step 3).");
       return;
     }
 
@@ -83,26 +132,24 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          legalName: value(formData, "legal_name"),
-          email: value(formData, "email"),
+          legalName,
+          email,
           phone: value(formData, "phone"),
-          country: value(formData, "country"),
-          dateOfBirth: value(formData, "date_of_birth"),
-          documentType: value(formData, "document_type"),
-          storeName: value(formData, "store_name"),
-          sellerType: value(formData, "seller_type"),
+          country,
+          dateOfBirth,
+          documentType: value(formData, "document_type") || "national_id",
+          storeName,
+          sellerType: value(formData, "seller_type") || "individual",
           productCategories,
-          deliveryPlan: value(formData, "delivery_plan"),
+          deliveryPlan,
           residentialAddress: value(formData, "residential_address"),
           businessName: value(formData, "business_name"),
           registrationNumber: value(formData, "registration_number"),
-          payoutMethod: value(formData, "payout_method"),
-          payoutCountry: value(formData, "payout_country"),
-          accountHolderName: value(formData, "account_holder_name"),
-          sellerRulesAccepted:
-            values(formData, "seller_rules").length ===
-            form.querySelectorAll<HTMLInputElement>('input[name="seller_rules"]').length,
-          kycConsent: checkboxChecked(formData, "kyc_consent"),
+          payoutMethod: value(formData, "payout_method") || "bank_transfer",
+          payoutCountry,
+          accountHolderName,
+          sellerRulesAccepted: sellerRules.length === totalRulesCount,
+          kycConsent,
         }),
       });
 
@@ -126,7 +173,7 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
         if (result.type === "failed") {
           setError(
             result.error?.message ||
-              "Didit verification could not be completed. Please try again.",
+              "Didit verification could not be completed. Please try again."
           );
         }
       };
@@ -140,32 +187,35 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-3">
+    <div className="flex flex-col items-start gap-2.5">
       <button
         type="button"
         onClick={startKyc}
         disabled={isLoading}
-        className="btn-neon shrink-0 text-sm !px-6 !py-3 disabled:cursor-not-allowed disabled:opacity-70"
+        className="btn-neon shrink-0 text-sm !px-7 !py-3.5 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-neon-purple/20"
       >
         <span className="relative z-10 flex items-center gap-2">
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin text-white" />
           ) : (
-            <ShieldCheck className="h-4 w-4" />
+            <ShieldCheck className="h-4 w-4 text-neon-green" />
           )}
-          {isLoading ? "Creating Didit Session..." : "Start Live KYC Test"}
+          {isLoading ? "Starting Didit KYC Session..." : "Submit & Start Live KYC"}
         </span>
       </button>
 
       {error && (
-        <p className="max-w-md text-sm text-red-300">
-          {error}{" "}
-          {error.toLowerCase().includes("log in") && (
-            <Link href="/auth/login" className="font-medium text-neon-blue underline">
-              Log in here.
-            </Link>
-          )}
-        </p>
+        <div className="flex items-start gap-2 max-w-md p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-xs text-red-300">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+          <div className="leading-relaxed">
+            {error}{" "}
+            {error.toLowerCase().includes("log in") && (
+              <Link href="/auth/login" className="font-semibold text-neon-blue underline ml-1">
+                Log in here
+              </Link>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
