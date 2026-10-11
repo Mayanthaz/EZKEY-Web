@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 
+
 type SellerDashboardGateProps = {
   children: ReactNode;
 };
@@ -35,14 +36,15 @@ export default async function SellerDashboardGate({
         .maybeSingle(),
     ]);
 
-  const profileApproved =
-    profile?.role === "seller" && profile?.is_verified === true;
-  const verificationApproved =
-    !verificationError &&
-    (verification?.application_status === "verified" ||
-      verification?.status === "Approved");
+  const isAuthorized =
+    profile?.role === "seller" ||
+    profile?.role === "admin" ||
+    profile?.is_verified === true ||
+    (!verificationError &&
+      (verification?.application_status === "verified" ||
+        verification?.status === "Approved"));
 
-  if (!profileApproved && !verificationApproved) {
+  if (!isAuthorized) {
     redirect("/become-a-seller");
   }
 

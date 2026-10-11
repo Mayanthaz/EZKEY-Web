@@ -1,84 +1,199 @@
 "use client";
 
-import { DollarSign, Clock, Wallet } from "lucide-react";
-
-const payouts = [
-  { id: "PAY-001", amount: "$245.50", method: "Stripe", status: "completed", date: "Jul 5, 2026" },
-  { id: "PAY-002", amount: "$180.00", method: "PayPal", status: "processing", date: "Jul 7, 2026" },
-  { id: "PAY-003", amount: "$520.75", method: "Stripe", status: "completed", date: "Jun 28, 2026" },
-];
+import { useState, useEffect } from "react";
+import {
+  DollarSign,
+  Clock,
+  Wallet,
+  ArrowUpRight,
+  ShieldCheck,
+  Loader2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { RequestPayoutDialog } from "@/components/seller/RequestPayoutDialog";
+import { toast } from "sonner";
 
 export default function PayoutsPage() {
+  const [financials, setFinancials] = useState<any>({
+    availableBalance: 0,
+    pendingEscrow: 0,
+    totalEarned: 0,
+    payouts: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    fetchPayouts();
+  }, []);
+
+  const fetchPayouts = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/seller/payouts");
+      const data = await res.json();
+      if (res.ok) {
+        setFinancials({
+          availableBalance: data.availableBalance || 0,
+          pendingEscrow: data.pendingEscrow || 0,
+          totalEarned: data.totalEarned || 0,
+          payouts: data.payouts || [],
+        });
+      } else {
+        toast.error(data.error || "Failed to load financials");
+      }
+    } catch {
+      toast.error("Failed to connect to internal payouts API");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Payouts</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your earnings and withdrawals</p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Earnings & Payouts Ledger</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Monitor escrow releases, track revenue net of 5% platform fees, and withdraw funds.
+          </p>
+        </div>
+        <Button
+          onClick={() => setIsDialogOpen(true)}
+          disabled={financials.availableBalance < 10}
+          className="bg-neon-purple text-white hover:bg-neon-purple/90 font-semibold"
+        >
+          <Wallet className="w-4 h-4 mr-2" />
+          Request Payout
+        </Button>
       </div>
 
+      {/* Financials Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card p-5">
+        <div className="glass-card p-5 group">
           <div className="w-10 h-10 rounded-xl bg-neon-green/10 flex items-center justify-center mb-3">
             <DollarSign className="w-5 h-5 text-neon-green" />
           </div>
-          <p className="font-display text-2xl font-bold">$2,450.25</p>
-          <p className="text-xs text-muted-foreground mt-1">Available Balance</p>
+          <p className="font-display text-2xl font-bold text-neon-green">
+            ${financials.availableBalance.toFixed(2)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Available for Withdrawal (Completed Orders)
+          </p>
         </div>
-        <div className="glass-card p-5">
+
+        <div className="glass-card p-5 group">
           <div className="w-10 h-10 rounded-xl bg-neon-blue/10 flex items-center justify-center mb-3">
             <Clock className="w-5 h-5 text-neon-blue" />
           </div>
-          <p className="font-display text-2xl font-bold">$180.00</p>
-          <p className="text-xs text-muted-foreground mt-1">Pending Payout</p>
+          <p className="font-display text-2xl font-bold text-neon-blue">
+            ${financials.pendingEscrow.toFixed(2)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Held in Escrow (Awaiting Buyer Confirmation)
+          </p>
         </div>
-        <div className="glass-card p-5">
+
+        <div className="glass-card p-5 group">
           <div className="w-10 h-10 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-3">
             <Wallet className="w-5 h-5 text-neon-purple" />
           </div>
-          <p className="font-display text-2xl font-bold">$12,450.00</p>
-          <p className="text-xs text-muted-foreground mt-1">Total Earned</p>
+          <p className="font-display text-2xl font-bold text-foreground">
+            ${financials.totalEarned.toFixed(2)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Total Net Lifetime Earnings
+          </p>
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <button className="btn-neon text-sm !px-6 !py-2.5">
-          <span className="relative z-10">Request Payout</span>
-        </button>
-      </div>
-
+      {/* Payout History Ledger */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-cyber-border">
-          <h2 className="font-display text-lg font-bold">Payout History</h2>
+        <div className="p-5 border-b border-cyber-border flex items-center justify-between">
+          <h2 className="font-display text-base font-bold">Payout Transactions</h2>
+          <span className="text-xs text-muted-foreground">
+            Minimum withdrawal threshold: $10.00
+          </span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-cyber-border">
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">ID</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Amount</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Method</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Status</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payouts.map((p) => (
-                <tr key={p.id} className="border-b border-cyber-border/50 hover:bg-white/[0.02] transition-colors">
-                  <td className="px-5 py-4"><span className="text-sm font-mono text-neon-purple">{p.id}</span></td>
-                  <td className="px-5 py-4"><span className="text-sm font-semibold text-neon-green">{p.amount}</span></td>
-                  <td className="px-5 py-4"><span className="text-sm text-muted-foreground">{p.method}</span></td>
-                  <td className="px-5 py-4">
-                    <span className={p.status === "completed" ? "badge-success" : "badge-info"}>
-                      {p.status === "completed" ? "✅ Completed" : "⏳ Processing"}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4"><span className="text-xs text-muted-foreground">{p.date}</span></td>
-                </tr>
+
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+            <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
+            <p className="text-xs">Loading ledger records...</p>
+          </div>
+        ) : financials.payouts.length === 0 ? (
+          <div className="py-12 text-center text-muted-foreground space-y-1">
+            <p className="text-sm font-semibold">No payout requests recorded</p>
+            <p className="text-xs">When you request a payout, the transaction log will appear here.</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="border-cyber-border">
+                <TableHead>Payout Reference</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead className="hidden sm:table-cell">Destination</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Date Requested</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {financials.payouts.map((p: any) => (
+                <TableRow key={p.id} className="border-cyber-border/40 hover:bg-white/[0.02]">
+                  <TableCell className="font-mono text-xs font-semibold text-neon-purple">
+                    {p.id}
+                  </TableCell>
+                  <TableCell className="font-bold text-neon-green">
+                    ${Number(p.amount).toFixed(2)}
+                  </TableCell>
+                  <TableCell className="capitalize text-xs font-medium">
+                    {p.method}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground hidden sm:table-cell max-w-[150px] truncate">
+                    {p.destination}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        p.status === "completed"
+                          ? "default"
+                          : p.status === "processing"
+                          ? "secondary"
+                          : "outline"
+                      }
+                      className="text-[10px] capitalize font-bold"
+                    >
+                      {p.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right text-xs text-muted-foreground">
+                    {new Date(p.created_at).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        )}
       </div>
+
+      {/* Request Payout Dialog */}
+      <RequestPayoutDialog
+        isOpen={isDialogOpen}
+        availableBalance={financials.availableBalance}
+        onClose={() => setIsDialogOpen(false)}
+        onPayoutRequested={() => fetchPayouts()}
+      />
     </div>
   );
 }

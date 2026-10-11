@@ -1,16 +1,112 @@
 "use client";
 
-import { User, Shield, CreditCard, Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Shield, CreditCard, Save, Loader2, CheckCircle2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { sellerSettingsSchema } from "@/lib/validations/seller";
 
 export default function SellerSettingsPage() {
+  const [businessName, setBusinessName] = useState("");
+  const [businessEmail, setBusinessEmail] = useState("");
+  const [bio, setBio] = useState("");
+  const [payoutMethod, setPayoutMethod] = useState<"stripe" | "paypal" | "bank_transfer">("stripe");
+  const [paypalEmail, setPaypalEmail] = useState("");
+  const [bankAccountInfo, setBankAccountInfo] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/seller/settings");
+      const data = await res.json();
+      if (res.ok && data.settings) {
+        setBusinessName(data.settings.business_name || "");
+        setBusinessEmail(data.settings.business_email || "");
+        setBio(data.settings.bio || "");
+        setPayoutMethod(data.settings.payout_method || "stripe");
+        setPaypalEmail(data.settings.paypal_email || "");
+        setBankAccountInfo(data.settings.bank_account_info || "");
+      }
+    } catch {
+      toast.error("Failed to load seller settings");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = {
+      business_name: businessName,
+      business_email: businessEmail,
+      bio,
+      payout_method: payoutMethod,
+      paypal_email: paypalEmail || undefined,
+      bank_account_info: bankAccountInfo || undefined,
+    };
+
+    const validation = sellerSettingsSchema.safeParse(payload);
+    if (!validation.success) {
+      toast.error(validation.error.issues[0]?.message || "Validation failed");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/seller/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update settings");
+      }
+
+      toast.success("Store profile and payout preferences saved!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save settings");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
+        <p className="text-xs">Loading store settings...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl space-y-6">
+    <form onSubmit={handleSave} className="max-w-3xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold">Seller Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your seller profile and payout details</p>
+        <h1 className="font-display text-2xl font-bold">Seller Store Profile & Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage your public seller branding, contact email, and payout withdrawal preferences.
+        </p>
       </div>
 
-      {/* Profile */}
+      {/* Store Profile */}
       <div className="glass-card p-6 space-y-5">
         <h2 className="font-display text-sm font-semibold flex items-center gap-2">
           <User className="w-4 h-4 text-neon-purple" />
@@ -18,69 +114,121 @@ export default function SellerSettingsPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Business Name</label>
-            <input type="text" placeholder="Your store name" className="input-neon" />
+            <label className="text-xs font-semibold text-foreground">
+              Business / Store Display Name <span className="text-red-400">*</span>
+            </label>
+            <Input
+              type="text"
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              placeholder="e.g. Apex Digital Keys"
+              required
+            />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Business Email</label>
-            <input type="email" placeholder="store@example.com" className="input-neon" />
+            <label className="text-xs font-semibold text-foreground">
+              Business Support Email <span className="text-red-400">*</span>
+            </label>
+            <Input
+              type="email"
+              value={businessEmail}
+              onChange={(e) => setBusinessEmail(e.target.value)}
+              placeholder="support@apexkeys.com"
+              required
+            />
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Bio</label>
-          <textarea placeholder="Tell buyers about your store..." rows={3} className="input-neon resize-none" />
+          <label className="text-xs font-semibold text-foreground">Store Bio / Description</label>
+          <Textarea
+            rows={3}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            placeholder="Tell buyers about your digital inventory, support hours, and warranty..."
+          />
         </div>
       </div>
 
-      {/* Payout */}
+      {/* Payout Preferences */}
       <div className="glass-card p-6 space-y-5">
         <h2 className="font-display text-sm font-semibold flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-neon-green" />
-          Payout Method
+          Payout Method & Bank Details
         </h2>
-        <div className="grid grid-cols-3 gap-3">
-          {["Stripe", "PayPal", "Bank Transfer"].map((method) => (
-            <button
-              key={method}
-              type="button"
-              className="p-4 rounded-xl border border-cyber-border text-center text-sm font-medium
-                       hover:border-neon-purple/30 hover:bg-neon-purple/5 transition-all"
-            >
-              {method}
-            </button>
-          ))}
-        </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium">PayPal Email</label>
-          <input type="email" placeholder="paypal@example.com" className="input-neon" />
+          <label className="text-xs font-semibold text-foreground">Preferred Payout Channel</label>
+          <Select value={payoutMethod} onValueChange={(v) => setPayoutMethod(v as any)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select payout method" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="stripe">Stripe Direct Connect</SelectItem>
+              <SelectItem value="paypal">PayPal</SelectItem>
+              <SelectItem value="bank_transfer">Direct Bank Wire</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        {payoutMethod === "paypal" && (
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground">PayPal Email</label>
+            <Input
+              type="email"
+              value={paypalEmail}
+              onChange={(e) => setPaypalEmail(e.target.value)}
+              placeholder="payouts@example.com"
+            />
+          </div>
+        )}
+
+        {payoutMethod === "bank_transfer" && (
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground">Bank Information / IBAN</label>
+            <Input
+              type="text"
+              value={bankAccountInfo}
+              onChange={(e) => setBankAccountInfo(e.target.value)}
+              placeholder="Account holder, IBAN / Routing #, SWIFT"
+            />
+          </div>
+        )}
       </div>
 
-      {/* ID Verification */}
-      <div className="glass-card p-6 space-y-5">
+      {/* Verification Status */}
+      <div className="glass-card p-6 space-y-4">
         <h2 className="font-display text-sm font-semibold flex items-center gap-2">
           <Shield className="w-4 h-4 text-neon-blue" />
-          ID Verification
+          Seller Verification Status
         </h2>
-        <div className="p-4 bg-neon-blue/5 border border-neon-blue/20 rounded-xl">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="badge-warning">Pending</span>
-            <span className="text-muted-foreground">Upload your ID to become a verified seller</span>
+        <div className="p-4 bg-neon-green/5 border border-neon-green/20 rounded-xl flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-neon-green shrink-0" />
+          <div className="text-xs">
+            <p className="font-bold text-foreground">Verified Merchant Account</p>
+            <p className="text-muted-foreground mt-0.5">
+              Your identity has been verified on EZKEY. Instant key delivery and marketplace listings are unlocked.
+            </p>
           </div>
-        </div>
-        <div className="border-2 border-dashed border-cyber-border rounded-xl p-8 text-center hover:border-neon-blue/30 transition-all cursor-pointer">
-          <Shield className="w-8 h-8 text-cyber-border mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Upload government-issued ID</p>
-          <p className="text-xs text-muted-foreground mt-1">Your data is encrypted and secure</p>
         </div>
       </div>
 
-      <button className="btn-neon !px-8 !py-3 flex items-center gap-2">
-        <span className="relative z-10 flex items-center gap-2">
-          <Save className="w-4 h-4" />
-          Save Changes
-        </span>
-      </button>
-    </div>
+      <Button
+        type="submit"
+        disabled={isSaving}
+        className="bg-neon-purple text-white hover:bg-neon-purple/90 font-semibold px-8"
+      >
+        {isSaving ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Saving Profile...
+          </>
+        ) : (
+          <>
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
+          </>
+        )}
+      </Button>
+    </form>
   );
 }
