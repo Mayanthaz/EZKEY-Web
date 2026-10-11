@@ -309,24 +309,9 @@ export function BecomeSellerWizard() {
                 key={step.num}
                 type="button"
                 onClick={() => {
-                  if (step.num === 1) setCurrentStep(1);
-                  if (step.num === 2) {
-                    if (step1Valid) setCurrentStep(2);
-                    else goToNextStep();
-                  }
-                  if (step.num === 3) {
-                    if (step1Valid && step2Valid) {
-                      if (!accountHolderName) setAccountHolderName(legalName);
-                      if (!payoutCountry) setPayoutCountry(country);
-                      setCurrentStep(3);
-                    } else if (!step1Valid) {
-                      setCurrentStep(1);
-                      toast.error("Please complete Step 1 first.");
-                    } else {
-                      setCurrentStep(2);
-                      toast.error("Please complete Step 2 first.");
-                    }
-                  }
+                  if (!accountHolderName && legalName) setAccountHolderName(legalName);
+                  if (!payoutCountry && country) setPayoutCountry(country);
+                  setCurrentStep(step.num);
                 }}
                 className={`relative flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
                   isActive

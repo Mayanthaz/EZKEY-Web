@@ -1,9 +1,9 @@
 "use client";
 
-import { DiditSdk } from "@didit-protocol/sdk-web";
-import { Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Loader2, ShieldCheck, AlertCircle, Sparkles, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { InbuiltKycModal } from "@/components/seller/InbuiltKycModal";
 
 type DiditKycButtonProps = {
   formId: string;
@@ -12,31 +12,23 @@ type DiditKycButtonProps = {
 type SessionResponse = {
   url?: string;
   sessionId?: string;
+  mode?: "didit" | "inbuilt";
+  diditConfigured?: boolean;
   error?: string;
+  message?: string;
 };
 
-async function readSessionResponse(response: Response) {
-  const contentType = response.headers.get("content-type") || "";
+async function readSessionResponse(response: Response): Promise<SessionResponse> {
   const text = await response.text();
-
-  if (contentType.includes("application/json")) {
-    try {
-      return JSON.parse(text) as SessionResponse;
-    } catch {
-      return { error: text || "Unable to start Didit KYC." };
-    }
-  }
-
   try {
     return JSON.parse(text) as SessionResponse;
   } catch {
-    return { error: text || "Unable to start Didit KYC." };
+    return { error: text || "Unable to start verification session." };
   }
 }
 
 function value(formData: FormData, key: string) {
   const entry = formData.get(key);
-
   return typeof entry === "string" ? entry.trim() : "";
 }
 
@@ -53,6 +45,16 @@ function checkboxChecked(formData: FormData, key: string) {
 export function DiditKycButton({ formId }: DiditKycButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Inbuilt KYC Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalDiditUrl, setModalDiditUrl] = useState<string | null>(null);
+  const [modalSessionId, setModalSessionId] = useState<string | null>(null);
+  const [applicantDetails, setApplicantDetails] = useState({
+    name: "Alexander James Vance",
+    dob: "1995-04-18",
+    docType: "National Identity Card (NIC)",
+  });
 
   async function startKyc() {
     setError(null);
@@ -125,6 +127,12 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
       return;
     }
 
+    setApplicantDetails({
+      name: legalName,
+      dob: dateOfBirth,
+      docType: value(formData, "document_type") || "National Identity Card (NIC)",
+    });
+
     setIsLoading(true);
 
     try {
@@ -155,68 +163,94 @@ export function DiditKycButton({ formId }: DiditKycButtonProps) {
 
       const data = await readSessionResponse(response);
 
-      if (!response.ok || !data.url) {
-        setError(data.error || "Unable to start Didit KYC.");
-        return;
+      if (data.url) {
+        setModalDiditUrl(data.url);
+        setModalSessionId(data.sessionId || null);
+        setIsModalOpen(true);
+      } else if (data.sessionId) {
+        setModalDiditUrl(null);
+        setModalSessionId(data.sessionId);
+        setIsModalOpen(true);
+      } else if (response.status === 401) {
+        setError(data.error || "Please log in to initiate seller KYC.");
+      } else {
+        // Launch Inbuilt Scanner fallback
+        setModalDiditUrl(null);
+        setModalSessionId("inbuilt_session");
+        setIsModalOpen(true);
       }
-
-      DiditSdk.shared.onComplete = (result) => {
-        if (result.type === "completed") {
-          const params = data.sessionId
-            ? `?sessionId=${encodeURIComponent(data.sessionId)}`
-            : "";
-
-          window.location.assign(`/become-a-seller/kyc-result${params}`);
-          return;
-        }
-
-        if (result.type === "failed") {
-          setError(
-            result.error?.message ||
-              "Didit verification could not be completed. Please try again."
-          );
-        }
-      };
-
-      await DiditSdk.shared.startVerification({ url: data.url });
     } catch {
-      setError("Unable to start Didit KYC. Please check your connection and try again.");
+      // Offline fallback: launch Inbuilt Camera Scanner directly
+      setModalDiditUrl(null);
+      setModalSessionId("inbuilt_offline");
+      setIsModalOpen(true);
     } finally {
       setIsLoading(false);
     }
   }
 
-  return (
-    <div className="flex flex-col items-start gap-2.5">
-      <button
-        type="button"
-        onClick={startKyc}
-        disabled={isLoading}
-        className="btn-neon shrink-0 text-sm !px-7 !py-3.5 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-neon-purple/20"
-      >
-        <span className="relative z-10 flex items-center gap-2">
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-white" />
-          ) : (
-            <ShieldCheck className="h-4 w-4 text-neon-green" />
-          )}
-          {isLoading ? "Starting Didit KYC Session..." : "Submit & Start Live KYC"}
-        </span>
-      </button>
+  const openDirectInbuiltScanner = () => {
+    setModalDiditUrl(null);
+    setModalSessionId(`inbuilt_${Date.now()}`);
+    setIsModalOpen(true);
+  };
 
-      {error && (
-        <div className="flex items-start gap-2 max-w-md p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-xs text-red-300">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
-          <div className="leading-relaxed">
-            {error}{" "}
-            {error.toLowerCase().includes("log in") && (
-              <Link href="/auth/login" className="font-semibold text-neon-blue underline ml-1">
-                Log in here
-              </Link>
-            )}
-          </div>
+  return (
+    <>
+      <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={startKyc}
+            disabled={isLoading}
+            className="btn-neon shrink-0 text-sm !px-7 !py-3.5 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-neon-purple/20"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-white" />
+              ) : (
+                <ShieldCheck className="h-4 w-4 text-neon-green" />
+              )}
+              {isLoading ? "Starting Verification..." : "Launch Inbuilt KYC Verification"}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={openDirectInbuiltScanner}
+            className="px-4 py-3 text-xs font-semibold rounded-xl border border-neon-blue/40 bg-neon-blue/10 hover:bg-neon-blue/20 text-neon-blue transition-all flex items-center gap-1.5"
+            title="Open camera document & face liveness scanner immediately"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Quick Camera Scanner
+          </button>
         </div>
-      )}
-    </div>
+
+        {error && (
+          <div className="flex items-start gap-2 max-w-md p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-xs text-red-300">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+            <div className="leading-relaxed">
+              {error}{" "}
+              {error.toLowerCase().includes("log in") && (
+                <Link href="/auth/login" className="font-semibold text-neon-blue underline ml-1">
+                  Log in here
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Embedded Inbuilt KYC Verification Modal */}
+      <InbuiltKycModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        diditUrl={modalDiditUrl}
+        sessionId={modalSessionId}
+        applicantName={applicantDetails.name}
+        applicantDob={applicantDetails.dob}
+        applicantDocument={applicantDetails.docType}
+      />
+    </>
   );
 }

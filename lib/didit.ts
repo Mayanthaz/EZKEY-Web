@@ -82,7 +82,7 @@ function getDiditApiKey() {
 }
 
 export function getDiditWorkflowId() {
-  return FREE_KYC_WORKFLOW_ID;
+  return process.env.DIDIT_WORKFLOW_ID || FREE_KYC_WORKFLOW_ID;
 }
 
 function splitName(fullName?: string) {
