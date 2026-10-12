@@ -19,6 +19,7 @@ import {
   PLATFORM_LABELS,
 } from "@/lib/constants";
 import MarqueeBanner from "@/components/layout/MarqueeBanner";
+import { ProductThumbnail } from "@/components/marketplace/ProductThumbnail";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -211,17 +212,11 @@ export default function HomePage() {
               >
                 {/* Thumbnail */}
                 <div className="relative h-44 bg-gradient-to-br from-cyber-card to-cyber-surface overflow-hidden">
-                  {listing.thumbnail_url ? (
-                    <img
-                      src={listing.thumbnail_url}
-                      alt={listing.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
-                    </div>
-                  )}
+                  <ProductThumbnail
+                    src={listing.thumbnail_url}
+                    alt={listing.title}
+                    className="group-hover:scale-105"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                   {/* Discount badge */}
                   {listing.original_price && (

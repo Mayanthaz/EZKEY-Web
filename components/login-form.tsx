@@ -2,10 +2,11 @@
 
 import { cn, hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { type OAuthProvider } from "@/components/auth/use-oauth-provider-status";
+import { OAuthSetupModal } from "@/components/auth/OAuthSetupModal";
+import { useOAuthProviderStatus, type OAuthProvider } from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff, AlertCircle, Info } from "lucide-react";
+import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff, AlertCircle, Info, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,6 +79,8 @@ export function LoginForm({
   };
 
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [oauthSetupProvider, setOauthSetupProvider] = useState<OAuthProvider | null>(null);
+  const { isProviderEnabled } = useOAuthProviderStatus();
 
   const handleOAuthLogin = async (provider: OAuthProvider) => {
     if (!hasEnvVars) {
@@ -87,21 +90,60 @@ export function LoginForm({
       return;
     }
 
+    // If known beforehand to be disabled, directly open setup modal
+    if (isProviderEnabled(provider) === false) {
+      setOauthSetupProvider(provider);
+      return;
+    }
+
     setOauthLoading(provider);
     setError(null);
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
+        if (
+          error.message?.toLowerCase().includes("not enabled") ||
+          error.message?.toLowerCase().includes("validation_failed")
+        ) {
+          setOauthSetupProvider(provider);
+          setOauthLoading(null);
+          return;
+        }
         setError(error.message);
         setOauthLoading(null);
+        return;
+      }
+
+      if (data?.url) {
+        // Probe endpoint to ensure Supabase doesn't return 400 Unsupported Provider
+        try {
+          const probe = await fetch(data.url);
+          if (!probe.ok) {
+            const errJson = await probe.json().catch(() => null);
+            if (
+              probe.status === 400 ||
+              errJson?.error_code === "validation_failed" ||
+              errJson?.msg?.includes("not enabled")
+            ) {
+              setOauthSetupProvider(provider);
+              setOauthLoading(null);
+              return;
+            }
+          }
+        } catch {
+          // Probe could fail due to CORS or network; proceed to navigate
+        }
+
+        window.location.href = data.url;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to initiate OAuth login");
@@ -274,6 +316,21 @@ export function LoginForm({
           </Button>
         </form>
 
+        {/* Quick Demo Test Option */}
+        <div className="mt-4 pt-4 border-t border-white/[0.08] text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setEmail("demo@ezkey.test");
+              setPassword("Password123!");
+            }}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-neon-purple transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-neon-green" />
+            <span>Fill Demo Credentials (demo@ezkey.test)</span>
+          </button>
+        </div>
+
         {/* Footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don&apos;t have an account?{" "}
@@ -285,6 +342,17 @@ export function LoginForm({
           </Link>
         </p>
       </div>
+
+      <OAuthSetupModal
+        isOpen={!!oauthSetupProvider}
+        onClose={() => setOauthSetupProvider(null)}
+        provider={oauthSetupProvider}
+        redirectPath={redirectPath}
+        onAutofillDemo={(em, pw) => {
+          setEmail(em);
+          setPassword(pw);
+        }}
+      />
     </div>
   );
 }

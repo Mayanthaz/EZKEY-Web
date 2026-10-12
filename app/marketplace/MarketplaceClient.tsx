@@ -18,6 +18,7 @@ import {
   MOCK_CATEGORIES,
   PLATFORM_LABELS,
 } from "@/lib/constants";
+import { ProductThumbnail } from "@/components/marketplace/ProductThumbnail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -370,17 +371,11 @@ export default function MarketplaceClient() {
                     >
                       {/* Thumbnail */}
                       <div className="relative h-44 bg-gradient-to-br from-cyber-card to-cyber-surface overflow-hidden">
-                        {listing.thumbnail_url ? (
-                          <img
-                            src={listing.thumbnail_url}
-                            alt={listing.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
-                          </div>
-                        )}
+                        <ProductThumbnail
+                          src={listing.thumbnail_url}
+                          alt={listing.title}
+                          className="group-hover:scale-105"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                         {listing.original_price && (
                           <Badge className="absolute top-3 left-3 bg-neon-green/90 text-black text-xs font-bold hover:bg-neon-green/90">
@@ -469,15 +464,11 @@ export default function MarketplaceClient() {
                       className="glass-card flex overflow-hidden group transition-all duration-300 hover:border-neon-purple/30"
                     >
                       <div className="relative w-48 h-36 bg-gradient-to-br from-cyber-card to-cyber-surface shrink-0 overflow-hidden flex items-center justify-center">
-                        {listing.thumbnail_url ? (
-                          <img
-                            src={listing.thumbnail_url}
-                            alt={listing.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <Gamepad2 className="w-12 h-12 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-300" />
-                        )}
+                        <ProductThumbnail
+                          src={listing.thumbnail_url}
+                          alt={listing.title}
+                          className="group-hover:scale-105"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                         {listing.original_price && (
                           <Badge className="absolute top-2 left-2 bg-neon-green/90 text-black text-[10px] font-bold hover:bg-neon-green/90">
