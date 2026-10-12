@@ -211,9 +211,18 @@ export default function HomePage() {
               >
                 {/* Thumbnail */}
                 <div className="relative h-44 bg-gradient-to-br from-cyber-card to-cyber-surface overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
-                  </div>
+                  {listing.thumbnail_url ? (
+                    <img
+                      src={listing.thumbnail_url}
+                      alt={listing.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                   {/* Discount badge */}
                   {listing.original_price && (
                     <Badge className="absolute top-3 left-3 bg-neon-green/90 text-black text-xs font-bold hover:bg-neon-green/90">

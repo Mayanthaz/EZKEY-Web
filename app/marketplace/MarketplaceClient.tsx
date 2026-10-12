@@ -370,9 +370,18 @@ export default function MarketplaceClient() {
                     >
                       {/* Thumbnail */}
                       <div className="relative h-44 bg-gradient-to-br from-cyber-card to-cyber-surface overflow-hidden">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
-                        </div>
+                        {listing.thumbnail_url ? (
+                          <img
+                            src={listing.thumbnail_url}
+                            alt={listing.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Gamepad2 className="w-16 h-16 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-500" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                         {listing.original_price && (
                           <Badge className="absolute top-3 left-3 bg-neon-green/90 text-black text-xs font-bold hover:bg-neon-green/90">
                             -{Math.round((1 - listing.price / listing.original_price) * 100)}%
@@ -459,8 +468,17 @@ export default function MarketplaceClient() {
                       href={`/marketplace/${listing.slug}`}
                       className="glass-card flex overflow-hidden group transition-all duration-300 hover:border-neon-purple/30"
                     >
-                      <div className="relative w-48 h-36 bg-gradient-to-br from-cyber-card to-cyber-surface shrink-0 flex items-center justify-center">
-                        <Gamepad2 className="w-12 h-12 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-300" />
+                      <div className="relative w-48 h-36 bg-gradient-to-br from-cyber-card to-cyber-surface shrink-0 overflow-hidden flex items-center justify-center">
+                        {listing.thumbnail_url ? (
+                          <img
+                            src={listing.thumbnail_url}
+                            alt={listing.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <Gamepad2 className="w-12 h-12 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors duration-300" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                         {listing.original_price && (
                           <Badge className="absolute top-2 left-2 bg-neon-green/90 text-black text-[10px] font-bold hover:bg-neon-green/90">
                             -{Math.round((1 - listing.price / listing.original_price) * 100)}%
