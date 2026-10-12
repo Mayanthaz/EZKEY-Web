@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { MOCK_LISTINGS, PLATFORM_LABELS } from "@/lib/constants";
 import ProductActions from "@/components/marketplace/ProductActions";
+import { ProductThumbnail } from "@/components/marketplace/ProductThumbnail";
 
 export function generateStaticParams() {
   return MOCK_LISTINGS.map((listing) => ({
@@ -111,15 +112,11 @@ export default async function ListingPage({
             {/* Image Gallery */}
             <div className="glass-card overflow-hidden">
               <div className="relative h-64 sm:h-80 md:h-96 bg-gradient-to-br from-cyber-card to-cyber-surface flex items-center justify-center overflow-hidden">
-                {listing.thumbnail_url ? (
-                  <img
-                    src={listing.thumbnail_url}
-                    alt={listing.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Gamepad2 className="w-24 h-24 text-cyber-border/40" />
-                )}
+                <ProductThumbnail
+                  src={listing.thumbnail_url}
+                  alt={listing.title}
+                  priority={true}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/60 via-transparent to-transparent pointer-events-none" />
                 {discountPercent > 0 && (
                   <div className="absolute top-4 left-4 px-3 py-1.5 bg-neon-green/90 text-black text-sm font-bold rounded-lg shadow-lg">
@@ -392,15 +389,11 @@ export default async function ListingPage({
                   className="glass-card overflow-hidden group transition-all duration-500 hover:-translate-y-1"
                 >
                   <div className="relative h-36 bg-gradient-to-br from-cyber-card to-cyber-surface flex items-center justify-center overflow-hidden">
-                    {item.thumbnail_url ? (
-                      <img
-                        src={item.thumbnail_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <Gamepad2 className="w-12 h-12 text-cyber-border/50 group-hover:text-neon-purple/30 transition-colors" />
-                    )}
+                    <ProductThumbnail
+                      src={item.thumbnail_url}
+                      alt={item.title}
+                      className="group-hover:scale-105"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 via-transparent to-transparent pointer-events-none" />
                     {item.original_price && (
                       <div className="absolute top-2 left-2 px-2 py-0.5 bg-neon-green/90 text-black text-[10px] font-bold rounded">

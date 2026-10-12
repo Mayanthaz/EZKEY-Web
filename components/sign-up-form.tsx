@@ -2,7 +2,8 @@
 
 import { cn, hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { type OAuthProvider } from "@/components/auth/use-oauth-provider-status";
+import { OAuthSetupModal } from "@/components/auth/OAuthSetupModal";
+import { useOAuthProviderStatus, type OAuthProvider } from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,6 +28,8 @@ export function SignUpForm({
   const [isLoading, setIsLoading] = useState(false);
   const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [oauthSetupProvider, setOauthSetupProvider] = useState<OAuthProvider | null>(null);
+  const { isProviderEnabled } = useOAuthProviderStatus();
   const router = useRouter();
 
   useEffect(() => {
@@ -97,21 +100,58 @@ export function SignUpForm({
       return;
     }
 
+    if (isProviderEnabled(provider) === false) {
+      setOauthSetupProvider(provider);
+      return;
+    }
+
     setOauthLoading(provider);
     setError(null);
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
+        if (
+          error.message?.toLowerCase().includes("not enabled") ||
+          error.message?.toLowerCase().includes("validation_failed")
+        ) {
+          setOauthSetupProvider(provider);
+          setOauthLoading(null);
+          return;
+        }
         setError(error.message);
         setOauthLoading(null);
+        return;
+      }
+
+      if (data?.url) {
+        try {
+          const probe = await fetch(data.url);
+          if (!probe.ok) {
+            const errJson = await probe.json().catch(() => null);
+            if (
+              probe.status === 400 ||
+              errJson?.error_code === "validation_failed" ||
+              errJson?.msg?.includes("not enabled")
+            ) {
+              setOauthSetupProvider(provider);
+              setOauthLoading(null);
+              return;
+            }
+          }
+        } catch {
+          // Probe could fail due to CORS or network; proceed to navigate
+        }
+
+        window.location.href = data.url;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to initiate OAuth login");
@@ -351,6 +391,13 @@ export function SignUpForm({
           </Link>
         </p>
       </div>
+
+      <OAuthSetupModal
+        isOpen={!!oauthSetupProvider}
+        onClose={() => setOauthSetupProvider(null)}
+        provider={oauthSetupProvider}
+        redirectPath={redirectPath}
+      />
     </div>
   );
 }
