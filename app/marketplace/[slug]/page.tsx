@@ -7,17 +7,14 @@ import {
   BadgeCheck,
   Shield,
   ArrowLeft,
-  ShoppingCart,
-  Heart,
-  Share2,
   Clock,
   Package,
-  MessageSquare,
   ChevronRight,
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
 import { MOCK_LISTINGS, PLATFORM_LABELS } from "@/lib/constants";
+import ProductActions from "@/components/marketplace/ProductActions";
 
 export function generateStaticParams() {
   return MOCK_LISTINGS.map((listing) => ({
@@ -334,31 +331,8 @@ export default async function ListingPage({
                 </span>
               </div>
 
-              {/* Buy Button */}
-              <button
-                className="btn-neon w-full text-base !py-4 group"
-                disabled={listing.stock_count <= 0}
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  Buy Now
-                </span>
-              </button>
-
-              {/* Secondary actions */}
-              <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-cyber-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-neon-purple/30 transition-all">
-                  <Heart className="w-4 h-4" />
-                  Wishlist
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-cyber-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-neon-blue/30 transition-all">
-                  <MessageSquare className="w-4 h-4" />
-                  Message
-                </button>
-                <button className="py-3 px-4 border border-cyber-border rounded-lg text-muted-foreground hover:text-foreground hover:border-neon-green/30 transition-all">
-                  <Share2 className="w-4 h-4" />
-                </button>
-              </div>
+              {/* Auth-gated Action Buttons */}
+              <ProductActions listingSlug={listing.slug} stockCount={listing.stock_count} />
 
               {/* Trust indicators */}
               <div className="space-y-3 pt-4 border-t border-cyber-border">

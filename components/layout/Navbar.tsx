@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   ShoppingCart,
@@ -39,11 +40,13 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const router = useRouter();
 
   const supabase = useMemo(() => (hasEnvVars ? createClient() : null), []);
 
@@ -74,6 +77,17 @@ export default function Navbar() {
     await supabase.auth.signOut();
     setUser(null);
     window.location.href = "/";
+  };
+
+  const handleCartClick = () => {
+    if (!user) {
+      toast.info("Please log in to view your cart");
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "/marketplace";
+      router.push(`/auth/login?redirectedFrom=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    // Navigate to cart/orders page for logged-in users
+    router.push("/dashboard/buyer/orders");
   };
 
   return (
@@ -147,6 +161,7 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  onClick={handleCartClick}
                   className="relative text-muted-foreground hover:text-foreground hover:bg-white/[0.05] rounded-xl"
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -328,6 +343,29 @@ export default function Navbar() {
                         <p className="text-sm font-medium truncate">{user.email}</p>
                         <p className="text-xs text-muted-foreground">Free Account</p>
                       </div>
+                    </div>
+                    <div className="space-y-1 pt-1">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/buyer/orders"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        My Orders
+                      </Link>
+                      <Link
+                        href="/dashboard/buyer/settings"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Settings
+                      </Link>
                     </div>
                     <Button
                       variant="ghost"

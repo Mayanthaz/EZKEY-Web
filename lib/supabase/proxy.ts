@@ -2,16 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
-function isPublicPath(pathname: string) {
+function isProtectedPath(pathname: string) {
   return (
-    pathname === "/" ||
-    pathname.startsWith("/auth") ||
-    pathname === "/api/webhooks/didit"
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/protected")
   );
 }
 
-function isApiPath(pathname: string) {
-  return pathname.startsWith("/api/");
+function isProtectedApiPath(pathname: string) {
+  return pathname.startsWith("/api/") && !pathname.startsWith("/api/webhooks/");
 }
 
 function redirectToLogin(request: NextRequest, reason?: string) {
@@ -36,11 +35,11 @@ export async function updateSession(request: NextRequest) {
   });
 
   if (!hasEnvVars) {
-    if (isPublicPath(pathname)) {
-      return supabaseResponse;
+    if (isProtectedPath(pathname)) {
+      return redirectToLogin(request, "auth-not-configured");
     }
 
-    if (isApiPath(pathname)) {
+    if (isProtectedApiPath(pathname)) {
       return NextResponse.json(
         {
           error:
@@ -50,7 +49,7 @@ export async function updateSession(request: NextRequest) {
       );
     }
 
-    return redirectToLogin(request, "auth-not-configured");
+    return supabaseResponse;
   }
 
   // With Fluid compute, don't put this client in a global environment
@@ -87,15 +86,17 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (!user && !isPublicPath(pathname)) {
-    if (isApiPath(pathname)) {
+  if (!user) {
+    if (isProtectedPath(pathname)) {
+      return redirectToLogin(request);
+    }
+
+    if (isProtectedApiPath(pathname)) {
       return NextResponse.json(
         { error: "Please log in before using this feature." },
         { status: 401 },
       );
     }
-
-    return redirectToLogin(request);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
