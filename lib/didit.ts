@@ -1,8 +1,8 @@
 const DIDIT_API_BASE_URL =
   process.env.DIDIT_API_BASE_URL || "https://verification.didit.me";
 
-// Per-session Didit workflow config for "Free KYC". This is not a secret.
-const FREE_KYC_WORKFLOW_ID = "54a83627-35c6-468c-b579-7be7d47dd4db";
+// Default Didit workflow ID configured for EZKEY.
+const DEFAULT_DIDIT_WORKFLOW_ID = "0a73d8b2-2692-405d-93b0-1e7c592b3f18";
 
 export type DiditSessionStatus =
   | "Not Started"
@@ -82,7 +82,7 @@ function getDiditApiKey() {
 }
 
 export function getDiditWorkflowId() {
-  return FREE_KYC_WORKFLOW_ID;
+  return process.env.DIDIT_WORKFLOW_ID || DEFAULT_DIDIT_WORKFLOW_ID;
 }
 
 function splitName(fullName?: string) {

@@ -2,13 +2,15 @@
 
 import { cn, hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import {
-  type OAuthProvider,
-  useOAuthProviderStatus,
-} from "@/components/auth/use-oauth-provider-status";
+import { type OAuthProvider } from "@/components/auth/use-oauth-provider-status";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Gamepad2, Mail, Lock, Loader2, Eye, EyeOff, AlertCircle, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 
 export function LoginForm({
   className,
@@ -21,7 +23,6 @@ export function LoginForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [isLoading, setIsLoading] = useState(false);
-  const oauthProviderStatus = useOAuthProviderStatus();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -55,7 +56,6 @@ export function LoginForm({
     }
 
     const trimmedEmail = email.trim();
-
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -66,15 +66,6 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-
-      // Use a full navigation instead of router.push(). Links across the
-      // site prefetch protected routes (e.g. /dashboard) while the user is
-      // signed out, so the client router cache can hold onto the anonymous
-      // "redirect to /auth/login" response for that route. A soft
-      // navigation right after login can replay that stale redirect and
-      // bounce the user straight back to the login page. A hard navigation
-      // guarantees the browser re-requests the page with the fresh session
-      // cookie and no stale cache.
       window.location.href = redirectPath;
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -86,6 +77,8 @@ export function LoginForm({
     return provider.charAt(0).toUpperCase() + provider.slice(1);
   };
 
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+
   const handleOAuthLogin = async (provider: OAuthProvider) => {
     if (!hasEnvVars) {
       setError(
@@ -94,23 +87,25 @@ export function LoginForm({
       return;
     }
 
-    if (oauthProviderStatus.isProviderEnabled(provider) === false) {
-      setError(
-        `${getOAuthProviderLabel(provider)} sign-in is not enabled in Supabase yet. Enable the provider in Supabase Authentication > Providers first.`,
-      );
-      return;
-    }
+    setOauthLoading(provider);
+    setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
-      },
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
+        },
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setOauthLoading(null);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to initiate OAuth login");
+      setOauthLoading(null);
     }
   };
 
@@ -120,7 +115,7 @@ export function LoginForm({
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
-            <Gamepad2 className="w-8 h-8 text-neon-purple" />
+            <Gamepad2 className="w-8 h-8 text-neon-purple transition-all group-hover:text-neon-blue" />
             <span className="font-display text-xl font-bold text-gradient tracking-wider">
               EZKEY
             </span>
@@ -131,74 +126,84 @@ export function LoginForm({
           </p>
         </div>
 
-        {/* OAuth Buttons */}
+        {/* Alerts */}
         <div className="space-y-3 mb-6">
           {notice && (
-            <div className="rounded-lg border border-neon-blue/20 bg-neon-blue/10 px-4 py-3 text-sm text-neon-blue">
-              {notice}
-            </div>
+            <Alert className="border-neon-blue/20 bg-neon-blue/10 text-neon-blue [&>svg]:text-neon-blue">
+              <Info className="h-4 w-4" />
+              <AlertDescription>{notice}</AlertDescription>
+            </Alert>
           )}
 
           {!hasEnvVars && (
-            <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-              Authentication is unavailable until Supabase environment variables are added.
-            </div>
+            <Alert variant="destructive" className="border-red-500/30 bg-red-500/10 text-red-300">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Authentication is unavailable until Supabase environment variables are added.
+              </AlertDescription>
+            </Alert>
           )}
 
-          <button
-            onClick={() => handleOAuthLogin("google")}
-            disabled={
-              !hasEnvVars ||
-              oauthProviderStatus.isLoading ||
-              oauthProviderStatus.isProviderEnabled("google") === false
-            }
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-cyber-surface border border-cyber-border
-                     rounded-xl text-sm font-medium hover:bg-white/5 hover:border-cyber-border transition-all duration-300
-                     disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-            </svg>
-            Continue with Google
-          </button>
+          {error && (
+            <Alert variant="destructive" className="border-red-500/30 bg-red-500/10 text-red-300">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-          <button
-            onClick={() => handleOAuthLogin("discord")}
-            disabled={
-              !hasEnvVars ||
-              oauthProviderStatus.isLoading ||
-              oauthProviderStatus.isProviderEnabled("discord") === false
-            }
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#5865F2]/10 border border-[#5865F2]/20
-                     rounded-xl text-sm font-medium hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 transition-all duration-300
-                     disabled:cursor-not-allowed disabled:opacity-50"
+          {/* OAuth Buttons */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleOAuthLogin("google")}
+            disabled={!hasEnvVars || isLoading || oauthLoading !== null}
+            className="w-full border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 text-foreground gap-3 transition-all"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#5865F2">
-              <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-            </svg>
-            Continue with Discord
-          </button>
+            {oauthLoading === "google" ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            ) : (
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+            )}
+            <span>{oauthLoading === "google" ? "Connecting to Google..." : "Continue with Google"}</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleOAuthLogin("discord")}
+            disabled={!hasEnvVars || isLoading || oauthLoading !== null}
+            className="w-full border-[#5865F2]/20 bg-[#5865F2]/10 hover:bg-[#5865F2]/20 hover:border-[#5865F2]/40 text-foreground gap-3 transition-all"
+          >
+            {oauthLoading === "discord" ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#5865F2]/20 border-t-[#5865F2]" />
+            ) : (
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#5865F2">
+                <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+              </svg>
+            )}
+            <span>{oauthLoading === "discord" ? "Connecting to Discord..." : "Continue with Discord"}</span>
+          </Button>
         </div>
 
         {/* Divider */}
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-cyber-border" />
+          <Separator className="flex-1 bg-white/[0.08]" />
           <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
-          <div className="flex-1 h-px bg-cyber-border" />
+          <Separator className="flex-1 bg-white/[0.08]" />
         </div>
 
         {/* Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
+            <Label htmlFor="email">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
@@ -206,16 +211,14 @@ export function LoginForm({
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-neon !pl-11"
+                className="pl-11 bg-white/[0.03] border-white/10 focus:border-neon-purple/60 focus:ring-neon-purple/20 focus-visible:ring-neon-purple/20 text-foreground placeholder:text-muted-foreground/50"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
+              <Label htmlFor="password">Password</Label>
               <Link
                 href="/auth/forgot-password"
                 className="text-xs text-neon-purple hover:text-neon-blue transition-colors"
@@ -224,35 +227,38 @@ export function LoginForm({
               </Link>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 required
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-neon !pl-11 !pr-11"
+                className="pl-11 pr-11 bg-white/[0.03] border-white/10 focus:border-neon-purple/60 focus-visible:ring-neon-purple/20 text-foreground"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              </Button>
             </div>
           </div>
 
           {error && (
-            <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
-              {error}
-            </div>
+            <Alert variant="destructive" className="border-red-500/30 bg-red-500/10">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-red-400">{error}</AlertDescription>
+            </Alert>
           )}
 
-          <button
+          <Button
             type="submit"
-            className="btn-neon w-full !py-3.5"
+            className="btn-neon w-full !py-3.5 border-0"
             disabled={isLoading || !hasEnvVars}
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
@@ -265,7 +271,7 @@ export function LoginForm({
                 "Log In"
               )}
             </span>
-          </button>
+          </Button>
         </form>
 
         {/* Footer */}

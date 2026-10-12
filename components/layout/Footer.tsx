@@ -10,6 +10,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
+import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
   return (
@@ -19,7 +20,7 @@ export default function Footer() {
 
       <div className="section-container relative z-10">
         {/* Trust Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-10 border-b border-white/[0.06]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-10">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center shrink-0">
               <Shield className="w-6 h-6 text-neon-purple" />
@@ -54,6 +55,8 @@ export default function Footer() {
             </div>
           </div>
         </div>
+
+        <Separator className="bg-white/[0.06]" />
 
         {/* Main Footer */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12">
@@ -153,8 +156,9 @@ export default function Footer() {
           </div>
         </div>
 
+        <Separator className="bg-white/[0.06]" />
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between py-6 border-t border-white/[0.06] gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between py-6 gap-4">
           <p className="text-xs text-muted-foreground">
             © <CurrentYear /> EZKEY. All rights reserved.
           </p>
