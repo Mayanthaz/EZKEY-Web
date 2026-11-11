@@ -17,12 +17,6 @@ import { MOCK_LISTINGS, PLATFORM_LABELS } from "@/lib/constants";
 import ProductActions from "@/components/marketplace/ProductActions";
 import { ProductThumbnail } from "@/components/marketplace/ProductThumbnail";
 
-export function generateStaticParams() {
-  return MOCK_LISTINGS.map((listing) => ({
-    slug: listing.slug,
-  }));
-}
-
 // Generate metadata dynamically for SEO
 export async function generateMetadata({
   params,

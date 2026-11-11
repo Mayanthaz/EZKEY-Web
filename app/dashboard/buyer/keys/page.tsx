@@ -6,32 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-const gameKeys = [
-  {
-    id: "1",
-    title: "Cyberpunk 2077 Ultimate Edition",
-    key: "CYBER-2077-A9F2-K891-PL03",
-    platform: "Steam",
-    purchasedAt: "Jul 7, 2026",
-    activated: true,
-  },
-  {
-    id: "2",
-    title: "Elden Ring Shadow of the Erdtree DLC",
-    key: "ELDEN-RING-77B2-MM89-QQ12",
-    platform: "Steam",
-    purchasedAt: "Jul 6, 2026",
-    activated: false,
-  },
-  {
-    id: "3",
-    title: "Xbox Game Pass Ultimate — 12 Months",
-    key: "XGPU-12M0-99X4-WW55-TT88",
-    platform: "Xbox",
-    purchasedAt: "Jun 28, 2026",
-    activated: true,
-  },
-];
+type GameKey = {
+  id: string;
+  title: string;
+  key: string;
+  platform: string;
+  purchasedAt: string;
+  activated: boolean;
+};
+
+const gameKeys: GameKey[] = [];
 
 export default function BuyerKeysPage() {
   const [revealedKeys, setRevealedKeys] = useState<Set<string>>(new Set());
@@ -58,6 +42,11 @@ export default function BuyerKeysPage() {
       </div>
 
       <div className="grid gap-4">
+        {gameKeys.length === 0 && (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            No keys in your vault yet.
+          </p>
+        )}
         {gameKeys.map((item) => {
           const isRevealed = revealedKeys.has(item.id);
           const maskedKey = item.key.replace(

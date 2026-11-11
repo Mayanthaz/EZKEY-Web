@@ -41,13 +41,7 @@ export default function CategoriesPage() {
               <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                 {cat.description}
               </p>
-              <div className="flex items-center justify-between pt-4 border-t border-cyber-border">
-                <span className="text-sm text-muted-foreground">
-                  <span className="text-foreground font-medium">
-                    {cat.count.toLocaleString()}
-                  </span>{" "}
-                  listings
-                </span>
+              <div className="flex items-center justify-end pt-4 border-t border-cyber-border">
                 <span className="text-xs text-neon-purple font-medium group-hover:text-neon-blue transition-colors">
                   Browse →
                 </span>

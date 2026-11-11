@@ -28,7 +28,7 @@ import {
 const stats = [
   {
     label: "Total Purchases",
-    value: "23",
+    value: "0",
     icon: ShoppingCart,
     colorClass: "text-neon-blue",
     bgClass: "bg-neon-blue/10 border-neon-blue/20",
@@ -36,7 +36,7 @@ const stats = [
   },
   {
     label: "Active Deliveries",
-    value: "3",
+    value: "0",
     icon: Package,
     colorClass: "text-neon-purple",
     bgClass: "bg-neon-purple/10 border-neon-purple/20",
@@ -44,7 +44,7 @@ const stats = [
   },
   {
     label: "Digital Keys in Vault",
-    value: "18",
+    value: "0",
     icon: Key,
     colorClass: "text-neon-green",
     bgClass: "bg-neon-green/10 border-neon-green/20",
@@ -52,7 +52,7 @@ const stats = [
   },
   {
     label: "Verified Buyer Rating",
-    value: "5.0 ★",
+    value: "—",
     icon: Star,
     colorClass: "text-yellow-400",
     bgClass: "bg-yellow-400/10 border-yellow-400/20",
@@ -60,35 +60,17 @@ const stats = [
   },
 ];
 
-const recentPurchases = [
-  {
-    id: "ORD-8a4f2c1d",
-    title: "Cyberpunk 2077 Ultimate Edition",
-    seller: "KeyMaster",
-    price: 29.99,
-    status: "completed",
-    date: "2 hours ago",
-    platform: "Steam",
-  },
-  {
-    id: "ORD-3b7e9f0a",
-    title: "Elden Ring Shadow of the Erdtree DLC",
-    seller: "GameVault",
-    price: 34.99,
-    status: "delivered",
-    date: "1 day ago",
-    platform: "Steam",
-  },
-  {
-    id: "ORD-6c2d4e8b",
-    title: "Xbox Game Pass Ultimate — 12 Months",
-    seller: "SubKing",
-    price: 119.99,
-    status: "paid",
-    date: "3 days ago",
-    platform: "Xbox",
-  },
-];
+type RecentPurchase = {
+  id: string;
+  title: string;
+  seller: string;
+  price: number;
+  status: string;
+  date: string;
+  platform: string;
+};
+
+const recentPurchases: RecentPurchase[] = [];
 
 export default function BuyerDashboard() {
   return (
@@ -186,6 +168,13 @@ export default function BuyerDashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {recentPurchases.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
+                  No purchases yet.
+                </TableCell>
+              </TableRow>
+            )}
             {recentPurchases.map((order) => (
               <TableRow
                 key={order.id}

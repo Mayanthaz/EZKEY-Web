@@ -105,23 +105,9 @@ export function LoginForm({
         if (!error) return;
       }
 
-      // Seamless fallback: Sign in with dedicated verified Google or Discord profile
-      const providerAccounts: Record<OAuthProvider, { email: string; pass: string }> = {
-        google: { email: "google.gamer@ezkey.gg", pass: "GoogleUserPassword123!" },
-        discord: { email: "discord.gamer@ezkey.gg", pass: "DiscordUserPassword123!" },
-        facebook: { email: "demo@ezkey.test", pass: "Password123!" },
-      };
-
-      const account = providerAccounts[provider] || providerAccounts.google;
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: account.email,
-        password: account.pass,
-      });
-
-      if (signInError) throw signInError;
-
-      // Successfully authenticated! Redirect with session cookies
-      window.location.href = redirectPath;
+      throw new Error(
+        `${getOAuthProviderLabel(provider)} sign-in is not enabled for this project yet.`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to sign in with ${provider}`);
       setOauthLoading(null);
@@ -292,21 +278,6 @@ export function LoginForm({
             </span>
           </Button>
         </form>
-
-        {/* Quick Demo Test Option */}
-        <div className="mt-4 pt-4 border-t border-white/[0.08] text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setEmail("demo@ezkey.test");
-              setPassword("Password123!");
-            }}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-neon-purple transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-neon-green" />
-            <span>Fill Demo Credentials (demo@ezkey.test)</span>
-          </button>
-        </div>
 
         {/* Footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">

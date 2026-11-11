@@ -24,7 +24,7 @@ export async function generateMetadata({
 
   return {
     title: category.name,
-    description: `Browse ${category.count.toLocaleString()} ${category.name.toLowerCase()} on EZKEY marketplace. ${category.description}`,
+    description: `Browse ${category.name.toLowerCase()} on EZKEY marketplace. ${category.description}`,
   };
 }
 
@@ -74,9 +74,6 @@ export default async function CategoryPage({
             <div>
               <h1 className="font-display text-2xl sm:text-3xl font-bold">{category.name}</h1>
               <p className="text-muted-foreground mt-1">{category.description}</p>
-              <p className="text-sm text-neon-purple mt-2 font-medium">
-                {category.count.toLocaleString()} listings available
-              </p>
             </div>
           </div>
         </div>
