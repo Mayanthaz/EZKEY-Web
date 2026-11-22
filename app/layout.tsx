@@ -89,7 +89,10 @@ export default function RootLayout({
         </Suspense>
         <TooltipProvider>
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          {/* overflow-x-clip: decorative glows can never widen the page on phones
+              (which would make mobile browsers zoom out). Unlike overflow-hidden,
+              clip keeps position: sticky working. */}
+          <main className="min-h-screen overflow-x-clip">{children}</main>
           <Footer />
           <ChatbotFab />
           <Toaster richColors theme="dark" />

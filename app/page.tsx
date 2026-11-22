@@ -155,7 +155,7 @@ export default function HomePage() {
       {/* ============================================================
           FEATURED LISTINGS SECTION
           ============================================================ */}
-      <section className="relative py-20 bg-cyber-darker">
+      <section className="relative py-20 bg-cyber-darker overflow-hidden">
         {/* Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-neon-purple/5 rounded-full blur-[100px] pointer-events-none" />
 
