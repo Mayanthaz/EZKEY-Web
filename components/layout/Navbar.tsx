@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Zap,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
@@ -175,6 +176,23 @@ export default function Navbar() {
 
             {user ? (
               <>
+                {/* Chat */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-xl"
+                    >
+                      <Link href="/chat" aria-label="Chat">
+                        <MessageSquare className="w-5 h-5" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Chat</TooltipContent>
+                </Tooltip>
+
                 {/* Notifications */}
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -351,6 +369,13 @@ export default function Navbar() {
                       >
                         <LayoutDashboard className="w-4 h-4" />
                         Dashboard
+                      </Link>
+                      <Link
+                        href="/chat"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Chat
                       </Link>
                       <Link
                         href="/dashboard/buyer/orders"

@@ -84,31 +84,6 @@ export function BecomeSellerWizard() {
   const [acceptedRules, setAcceptedRules] = useState<string[]>([]);
   const [kycConsent, setKycConsent] = useState(false);
 
-  // Auto-Fill sample data for quick testing and streamlined UX
-  const handleAutoFill = () => {
-    setLegalName("Alexander James Vance");
-    setEmail("alex.vance@apexvault.io");
-    setPhone("+1 (415) 890-3421");
-    setCountry("United States");
-    setStoreName("Apex Key Vault");
-    setSellerType("individual");
-    setSelectedCategories(["Digital keys", "Digital apps", "Vouchers"]);
-    setDateOfBirth("1995-04-18");
-    setDocumentType("national_id");
-    setResidentialAddress("742 Evergreen Terrace, San Francisco, CA 94107, USA");
-    setDeliveryPlan(
-      "Automated 24/7 digital key delivery using EZKEY Instant Vault API with encrypted key codes and 15-minute SLA ticket support."
-    );
-    setPayoutMethod("bank_transfer");
-    setPayoutCountry("United States");
-    setAccountHolderName("Alexander James Vance");
-    setAcceptedRules([...SELLER_RULES]);
-    setKycConsent(true);
-
-    toast.success("Sample application filled with valid merchant data!", {
-      description: "You can review or edit any fields, then proceed through all steps.",
-    });
-  };
 
   const handleReset = () => {
     setLegalName("");
@@ -253,17 +228,6 @@ export function BecomeSellerWizard() {
 
           {/* Quick Action Buttons: Auto-fill Demo Data & Reset */}
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              onClick={handleAutoFill}
-              variant="outline"
-              size="sm"
-              className="border-neon-purple/50 bg-neon-purple/10 hover:bg-neon-purple/20 text-neon-purple font-semibold text-xs h-9 px-3.5 transition-all shadow-sm shadow-neon-purple/10"
-              title="Populate with verified sample seller information for quick testing"
-            >
-              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-neon-purple" />
-              ⚡ Auto-Fill Demo
-            </Button>
             <Button
               type="button"
               onClick={handleReset}

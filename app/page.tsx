@@ -19,6 +19,7 @@ import {
   PLATFORM_LABELS,
 } from "@/lib/constants";
 import MarqueeBanner from "@/components/layout/MarqueeBanner";
+import HeroVideoBackground from "@/components/layout/HeroVideoBackground";
 import { ProductThumbnail } from "@/components/marketplace/ProductThumbnail";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,34 +34,37 @@ export default function HomePage() {
       {/* ============================================================
           HERO SECTION
           ============================================================ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-svh flex items-center overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-cyber-dark">
-          {/* Grid */}
-          <div className="absolute inset-0 bg-grid opacity-60" />
-          {/* Gradient orbs */}
-          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-neon-purple/[0.07] rounded-full blur-[150px] animate-float" />
-          <div className="absolute bottom-20 right-10 w-[400px] h-[400px] bg-neon-blue/[0.07] rounded-full blur-[120px] animate-float" style={{ animationDelay: "3s" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/[0.03] rounded-full blur-[200px]" />
-          {/* Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-cyber-dark/60 via-transparent to-cyber-dark" />
+          {/* Fallback glow (visible while video loads, or when video is disabled) */}
+          <div className="absolute inset-0 bg-grid opacity-40" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[80vw] max-w-[600px] aspect-square bg-neon-purple/[0.08] rounded-full blur-[120px]" />
+          {/* Background videos: play one after another, then loop */}
+          <HeroVideoBackground />
+          {/* Dark overlay for text readability (stronger on small screens) */}
+          <div className="absolute inset-0 bg-cyber-dark/65 sm:bg-cyber-dark/55" />
+          {/* Radial focus behind the centered copy */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.45)_0%,transparent_70%)]" />
+          {/* Vignette: fade into the page below */}
+          <div className="absolute inset-0 bg-gradient-to-b from-cyber-dark/70 via-transparent to-cyber-dark" />
         </div>
 
-        <div className="section-container relative z-10 pt-36 pb-20">
+        <div className="section-container relative z-10 pt-28 pb-16 sm:pt-36 sm:pb-20">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-8 animate-fade-in">
+            <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 animate-fade-in">
               <Badge
                 variant="outline"
-                className="px-4 py-1.5 bg-white/[0.04] border-white/10 text-muted-foreground rounded-full text-sm font-normal gap-2"
+                className="px-3 sm:px-4 py-1.5 bg-white/[0.04] border-white/10 text-muted-foreground rounded-full text-xs sm:text-sm font-normal gap-2 backdrop-blur-sm"
               >
                 <Sparkles className="w-3.5 h-3.5 text-neon-purple" />
-                Trusted by 50,000+ digital buyers and sellers
+                A marketplace for digital buyers and sellers
               </Badge>
             </div>
 
             {/* Heading */}
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold
+            <h1 className="font-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl font-extrabold
                          leading-[1.05] tracking-tight mb-6 animate-slide-up">
               <span className="text-foreground">Your Premium</span>
               <br />
@@ -68,7 +72,7 @@ export default function HomePage() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10
                         leading-relaxed animate-slide-up" style={{ animationDelay: "0.1s" }}>
               Buy and sell digital apps, vouchers, keys, accounts, and digital assets
               with <span className="text-neon-green font-medium">secure escrow protection</span> and{" "}
@@ -76,9 +80,9 @@ export default function HomePage() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16
                           animate-slide-up" style={{ animationDelay: "0.2s" }}>
-              <Button asChild className="btn-neon border-0 text-base !px-8 !py-4 group h-auto">
+              <Button asChild className="btn-neon border-0 text-base !px-8 !py-4 group h-auto w-full sm:w-auto">
                 <Link href="/marketplace">
                   <span className="relative z-10 flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5" />
@@ -87,36 +91,12 @@ export default function HomePage() {
                   </span>
                 </Link>
               </Button>
-              <Button variant="outline" asChild className="btn-ghost-neon border-white/10 text-base !px-8 !py-4 h-auto group">
+              <Button variant="outline" asChild className="btn-ghost-neon border-white/10 text-base !px-8 !py-4 h-auto group w-full sm:w-auto">
                 <Link href="/become-a-seller">
                   Become a Seller
                   <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-            </div>
-
-            {/* Stats Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px max-w-3xl mx-auto rounded-2xl border border-white/[0.06]
-                          bg-white/[0.02] backdrop-blur-sm overflow-hidden animate-fade-in" style={{ animationDelay: "0.4s" }}>
-              {[
-                { value: "50K+", label: "Active Users", icon: Users },
-                { value: "120K+", label: "Listings", icon: ShoppingBag },
-                { value: "99.9%", label: "Uptime", icon: Zap },
-                { value: "4.9★", label: "Rating", icon: Star },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="text-center group py-5 px-2 hover:bg-white/[0.03] transition-colors duration-300"
-                >
-                  <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <stat.icon className="w-4 h-4 text-neon-purple opacity-70" />
-                    <span className="font-display text-2xl sm:text-3xl font-bold text-foreground">
-                      {stat.value}
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -166,9 +146,6 @@ export default function HomePage() {
                 <h3 className="text-sm font-semibold mb-1 group-hover:text-neon-purple transition-colors">
                   {cat.name}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  {cat.count.toLocaleString()} items
-                </p>
               </Link>
             ))}
           </div>
@@ -204,6 +181,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {featuredListings.length === 0 && (
+              <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
+                No featured listings yet.
+              </p>
+            )}
             {featuredListings.map((listing) => (
               <Link
                 key={listing.id}

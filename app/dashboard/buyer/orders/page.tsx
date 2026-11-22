@@ -16,35 +16,17 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const orders = [
-  {
-    id: "ORD-8a4f2c1d",
-    title: "Cyberpunk 2077 Ultimate Edition",
-    seller: "KeyMaster",
-    amount: "$29.99",
-    status: "completed",
-    date: "Jul 7, 2026",
-    platform: "Steam",
-  },
-  {
-    id: "ORD-3b7e9f0a",
-    title: "Elden Ring Shadow of the Erdtree DLC",
-    seller: "GameVault",
-    amount: "$34.99",
-    status: "delivered",
-    date: "Jul 6, 2026",
-    platform: "Steam",
-  },
-  {
-    id: "ORD-6c2d4e8b",
-    title: "Xbox Game Pass Ultimate — 12 Months",
-    seller: "SubKing",
-    amount: "$119.99",
-    status: "paid",
-    date: "Jul 5, 2026",
-    platform: "Xbox",
-  },
-];
+type BuyerOrder = {
+  id: string;
+  title: string;
+  seller: string;
+  amount: string;
+  status: string;
+  date: string;
+  platform: string;
+};
+
+const orders: BuyerOrder[] = [];
 
 export default function BuyerOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,6 +89,13 @@ export default function BuyerOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {filteredOrders.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                  No orders yet.
+                </TableCell>
+              </TableRow>
+            )}
             {filteredOrders.map((order) => (
               <TableRow
                 key={order.id}
