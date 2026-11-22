@@ -4,20 +4,36 @@ import { useEffect, useRef, useState } from "react";
 
 /**
  * Hero background clips, played one after another and looped forever.
- * Files live in /public/videos and are served with a 1-year immutable
- * Cache-Control header (see next.config.ts).
+ * Landscape screens get the 16:9 set, portrait screens (phones, portrait
+ * tablets) get the 9:16 set, so neither is heavily cropped. Each visitor
+ * only downloads the set for their screen.
  *
+ * Files live in /public/videos (and /public/videos/mobile) and are served
+ * with a 1-year immutable Cache-Control header (see next.config.ts).
  * When you REPLACE a file's contents without renaming it, bump
  * VIDEO_VERSION so every visitor's browser fetches the new copy.
  */
 const VIDEO_VERSION = "1";
 
-export const HERO_VIDEOS = [
-  "/videos/hero-penthouse.mp4",
-  "/videos/hero-gamer.mp4",
-  "/videos/hero-retro-arcade.mp4",
-  "/videos/hero-studio.mp4",
-] as const;
+export const HERO_VIDEOS = {
+  desktop: [
+    "/videos/hero-penthouse.mp4",
+    "/videos/hero-gamer.mp4",
+    "/videos/hero-retro-arcade.mp4",
+    "/videos/hero-studio.mp4",
+  ],
+  mobile: [
+    "/videos/mobile/hero-gaming-pc.mp4",
+    "/videos/mobile/hero-bedroom-gamer.mp4",
+    "/videos/mobile/hero-retro-arcade.mp4",
+    "/videos/mobile/hero-studio.mp4",
+  ],
+} as const;
+
+type Variant = keyof typeof HERO_VIDEOS;
+
+/** Portrait viewports use the vertical (9:16) clips. */
+const MOBILE_QUERY = "(orientation: portrait)";
 
 /** Crossfade length between clips. */
 const FADE_MS = 800;
@@ -45,29 +61,40 @@ export default function HeroVideoBackground({ className = "" }: { className?: st
   const slotA = useRef<HTMLVideoElement>(null);
   const slotB = useRef<HTMLVideoElement>(null);
 
-  const [enabled, setEnabled] = useState(false);
+  // null = video disabled (server render, reduced motion, data saver, 2G).
+  const [variant, setVariant] = useState<Variant | null>(null);
   const [activeSlot, setActiveSlot] = useState<0 | 1>(0);
 
   // Mutable playback state (doesn't need re-renders).
   const state = useRef({
     active: 0 as 0 | 1,
-    clip: 0, // index into HERO_VIDEOS for the active slot
+    clip: 0, // index into the current clip list for the active slot
     switching: false,
     visible: true,
   });
 
+  // Choose the clip set for this screen, and switch it when the device rotates.
   useEffect(() => {
-    setEnabled(shouldPlayVideo());
+    if (!shouldPlayVideo()) return;
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const pick = () => setVariant(mq.matches ? "mobile" : "desktop");
+    pick();
+    mq.addEventListener("change", pick);
+    return () => mq.removeEventListener("change", pick);
   }, []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!variant) return;
     const slots = [slotA.current, slotB.current] as const;
     const [first, second] = slots;
     if (!first || !second) return;
 
-    const total: number = HERO_VIDEOS.length;
+    const clips = HERO_VIDEOS[variant];
+    const total: number = clips.length;
     const s = state.current;
+    // Fresh start for this clip set (the <video> elements are remounted per set).
+    Object.assign(s, { active: 0, clip: 0, switching: false });
+    setActiveSlot(0);
     const timers: ReturnType<typeof setTimeout>[] = [];
 
     const safePlay = (v: HTMLVideoElement) => {
@@ -77,7 +104,7 @@ export default function HeroVideoBackground({ className = "" }: { className?: st
     };
 
     const load = (v: HTMLVideoElement, clip: number) => {
-      v.src = withVersion(HERO_VIDEOS[clip % total]);
+      v.src = withVersion(clips[clip % total]);
       v.load();
     };
 
@@ -157,17 +184,27 @@ export default function HeroVideoBackground({ className = "" }: { className?: st
         v!.removeEventListener("timeupdate", onTimeUpdate);
         v!.removeEventListener("ended", onEnded);
         v!.pause();
+        // Abort any in-flight download of the outgoing clip set.
+        v!.removeAttribute("src");
+        v!.load();
       }
     };
-  }, [enabled]);
+  }, [variant]);
 
-  if (!enabled) return null;
+  if (!variant) return null;
 
   const videoClass =
-    "absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out";
+    "absolute inset-0 h-full w-full object-cover object-center transition-opacity ease-in-out";
 
   return (
-    <div ref={containerRef} className={`absolute inset-0 ${className}`} aria-hidden="true">
+    // key: remount fresh <video> elements when the clip set changes (rotation),
+    // so the old set stops downloading immediately.
+    <div
+      key={variant}
+      ref={containerRef}
+      className={`absolute inset-0 ${className}`}
+      aria-hidden="true"
+    >
       {[slotA, slotB].map((ref, i) => (
         <video
           key={i}
