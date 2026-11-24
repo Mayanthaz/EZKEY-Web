@@ -31,9 +31,6 @@
     --radius: 0.75rem;
   }
 
-  /* EZKEY dark theme — true-black, premium/modern surface with the same
-     purple → cyan brand accent language. This is the theme actually
-     used site-wide (see app/layout.tsx: <html class="dark">). */
   .dark {
     --background: 240 6% 4%;
     --foreground: 0 0% 97%;
@@ -63,181 +60,122 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-poppins), system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 {
-    font-family: var(--font-poppins), system-ui, sans-serif;
-  }
+  h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 }
 
 /* ============================================================
-   EZKEY Custom Utility Classes
+   EZKEY Custom Utilities — premium black + neon system
    ============================================================ */
 @layer components {
-  /* Glassmorphism Card — flat black surface, hairline border, soft elevation.
-     Color only shows up on hover/focus, keeping the resting UI calm and premium. */
+  /* Glass card — stronger depth, crisper edge, neon rim on hover */
   .glass-card {
-    @apply bg-cyber-card/70 backdrop-blur-2xl border border-white/[0.06] rounded-2xl;
+    @apply bg-cyber-card/70 backdrop-blur-2xl border border-white/[0.07] rounded-2xl;
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.03),
-      0 20px 40px -24px rgba(0, 0, 0, 0.8);
+      inset 0 1px 0 0 rgba(255,255,255,0.04),
+      0 12px 32px -20px rgba(0,0,0,0.85),
+      0 0 0 1px rgba(255,255,255,0.02);
+    transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease, transform 300ms ease;
   }
-
   .glass-card:hover {
-    @apply bg-cyber-card-hover/80 border-white/[0.12];
+    @apply bg-cyber-card-hover/80 border-white/[0.11];
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
-      0 24px 48px -20px rgba(0, 0, 0, 0.85),
-      0 0 0 1px rgba(139, 92, 246, 0.12);
+      inset 0 1px 0 0 rgba(255,255,255,0.06),
+      0 20px 48px -18px rgba(0,0,0,0.9),
+      0 0 0 1px rgba(139,92,246,0.14),
+      0 0 28px -8px rgba(139,92,246,0.18);
   }
 
-  /* Neon Glow Button — tighter, premium glow instead of a heavy blur wash */
+  /* Primary CTA — tighter highlight, no blur wash */
   .btn-neon {
-    @apply relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300;
-    background: linear-gradient(135deg, #8b5cf6, #22d3ee);
-    box-shadow:
-      0 8px 24px -8px rgba(139, 92, 246, 0.45),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+    @apply relative inline-flex items-center justify-center px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 35%, #22d3ee 100%);
+    box-shadow: 0 10px 28px -10px rgba(139,92,246,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
   }
-
   .btn-neon:hover {
-    box-shadow:
-      0 12px 32px -8px rgba(139, 92, 246, 0.55),
-      0 0 32px -6px rgba(34, 211, 238, 0.3),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
-    transform: translateY(-2px);
+    box-shadow: 0 14px 36px -10px rgba(139,92,246,0.6), 0 0 32px -10px rgba(34,211,238,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
+    transform: translateY(-1px);
   }
-
-  .btn-neon:active {
-    transform: translateY(0);
-  }
-
+  .btn-neon:active { transform: translateY(0); }
   .btn-neon::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-300;
     background: linear-gradient(135deg, #22d3ee, #8b5cf6);
   }
+  .btn-neon:hover::before { opacity: 1; }
 
-  .btn-neon:hover::before {
-    opacity: 1;
-  }
-
-  /* Ghost Button — neutral surface + hairline border by default (modern black-UI
-     pattern); brand color only appears on hover so it reads as premium, not loud. */
+  /* Ghost — stays quiet until hover, then brand rim */
   .btn-ghost-neon {
-    @apply px-6 py-3 font-semibold text-foreground bg-white/[0.02] border border-white/10 rounded-xl
-           transition-all duration-300 hover:bg-white/[0.06] hover:border-neon-purple/50
-           hover:text-white hover:shadow-[0_0_24px_-4px_rgba(139,92,246,0.35)];
+    @apply inline-flex items-center justify-center px-6 py-3 font-semibold rounded-xl border transition-all duration-300;
+    @apply bg-white/[0.03] border-white/10 text-foreground hover:bg-white/[0.06] hover:border-neon-purple/40 hover:text-white;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .btn-ghost-neon:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 24px -6px rgba(139,92,246,0.35); }
+
+  /* Subtle icon button — for toolbar controls */
+  .btn-icon-ghost {
+    @apply inline-flex items-center justify-center rounded-xl border border-transparent bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-white/[0.06] hover:border-white/10 transition-all duration-200;
   }
 
-  /* Status Badges */
-  .badge-success {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-neon-green/10 text-neon-green border border-neon-green/20;
-  }
+  /* Status badges */
+  .badge-success { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neon-green/10 text-neon-green border border-neon-green/20; }
+  .badge-warning { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neon-orange/10 text-neon-orange border border-neon-orange/20; }
+  .badge-danger  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20; }
+  .badge-info    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20; }
+  .badge-purple  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neon-purple/10 text-neon-purple border border-neon-purple/20; }
 
-  .badge-warning {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-neon-orange/10 text-neon-orange border border-neon-orange/20;
-  }
-
-  .badge-danger {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-red-500/10 text-red-400 border border-red-500/20;
-  }
-
-  .badge-info {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-neon-blue/10 text-neon-blue border border-neon-blue/20;
-  }
-
-  .badge-purple {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-neon-purple/10 text-neon-purple border border-neon-purple/20;
-  }
-
-  /* Cyber Grid Background — neutral hairline grid, not tinted, for a cleaner black canvas */
+  /* Grid */
   .bg-grid {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
-  /* Gradient Text */
-  .text-gradient {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #8b5cf6, #22d3ee);
-  }
+  /* Gradient text */
+  .text-gradient { @apply bg-clip-text text-transparent; background-image: linear-gradient(135deg, #8b5cf6, #22d3ee); }
+  .text-gradient-warm { @apply bg-clip-text text-transparent; background-image: linear-gradient(135deg, #f97316, #ec4899); }
 
-  .text-gradient-warm {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #f97316, #ec4899);
-  }
+  .section-container { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
-  /* Section Container */
-  .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* Input Neon */
+  /* Input — slightly taller hit area, clearer focus ring */
   .input-neon {
-    @apply w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl
-           text-foreground placeholder:text-muted-foreground/50
-           focus:outline-none focus:border-neon-purple/60 focus:ring-1 focus:ring-neon-purple/20 focus:bg-white/[0.05]
-           transition-all duration-300;
+    @apply w-full px-4 py-3.5 bg-white/[0.035] border border-white/10 rounded-xl text-[14px] leading-none
+           text-foreground placeholder:text-muted-foreground/45
+           focus:outline-none focus:border-neon-purple/55 focus:ring-4 focus:ring-neon-purple/10 focus:bg-white/[0.05]
+           transition-all duration-200;
   }
 
-  /* Scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { @apply bg-neon-purple/40; }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
+  .skeleton { @apply bg-white/[0.06] rounded animate-pulse; }
+  .divider-glow { @apply h-px w-full; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent); }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-cyber-border rounded-full;
-  }
+  /* Focus ring helper for custom controls */
+  .ring-neon:focus-visible { outline: none; box-shadow: 0 0 0 2px hsl(263 75% 63% / 0.35); }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-neon-purple/50;
-  }
-
-  /* Skeleton Loading */
-  .skeleton {
-    @apply bg-cyber-border/30 rounded animate-pulse;
-  }
-
-  /* Divider with glow */
-  .divider-glow {
-    @apply h-px w-full;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  /* Shimmer loader bar */
+  .shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
   }
 }
 
-/* ============================================================
-   Smooth scrolling & selection
-   ============================================================ */
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
+::selection { background: rgba(139,92,246,0.35); color: white; }
+:focus-visible { outline: 2px solid hsl(263 75% 63%); outline-offset: 2px; }
 
-::selection {
-  background: rgba(139, 92, 246, 0.35);
-  color: white;
-}
-
-/* ============================================================
-   Focus visible for accessibility
-   ============================================================ */
-:focus-visible {
-  outline: 2px solid hsl(263 75% 63%);
-  outline-offset: 2px;
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
