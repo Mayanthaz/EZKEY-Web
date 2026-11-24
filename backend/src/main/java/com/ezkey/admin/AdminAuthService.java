@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,8 +32,10 @@ public class AdminAuthService {
 
   private static final Logger log = LoggerFactory.getLogger(AdminAuthService.class);
 
-  static final int MAX_FAILED_ATTEMPTS = 5;
-  static final long LOCKOUT_MILLIS = Duration.ofMinutes(15).toMillis();
+  // Defaults (5 attempts / 15 minutes) are the production values; they can be loosened locally via
+  // ADMIN_LOGIN_MAX_ATTEMPTS / ADMIN_LOGIN_LOCKOUT_MINUTES in .env.
+  private final int maxFailedAttempts;
+  private final long lockoutMillis;
   private static final long VERIFY_CACHE_MILLIS = Duration.ofSeconds(30).toMillis();
 
   public record Session(String accessToken, String refreshToken, AdminUser user) {}
@@ -50,11 +53,18 @@ public class AdminAuthService {
   private final Map<String, Deque<Long>> failures = new ConcurrentHashMap<>();
 
   public AdminAuthService(
-      AppProperties props, SupabaseClient supabase, AdminDataClient data, ObjectMapper mapper) {
+      AppProperties props,
+      SupabaseClient supabase,
+      AdminDataClient data,
+      ObjectMapper mapper,
+      @Value("${ADMIN_LOGIN_MAX_ATTEMPTS:5}") int maxFailedAttempts,
+      @Value("${ADMIN_LOGIN_LOCKOUT_MINUTES:15}") long lockoutMinutes) {
     this.props = props;
     this.supabase = supabase;
     this.data = data;
     this.mapper = mapper;
+    this.maxFailedAttempts = Math.max(1, maxFailedAttempts);
+    this.lockoutMillis = Duration.ofMinutes(Math.max(1, lockoutMinutes)).toMillis();
   }
 
   // ---------------------------------------------------------------- login / refresh
@@ -211,21 +221,23 @@ public class AdminAuthService {
     if (attempts == null) {
       return;
     }
-    long cutoff = System.currentTimeMillis() - LOCKOUT_MILLIS;
+    long cutoff = System.currentTimeMillis() - lockoutMillis;
     synchronized (attempts) {
       while (!attempts.isEmpty() && attempts.peekFirst() < cutoff) {
         attempts.pollFirst();
       }
-      if (attempts.size() >= MAX_FAILED_ATTEMPTS) {
+      if (attempts.size() >= maxFailedAttempts) {
         throw new AdminException(
-            429, "TOO_MANY_ATTEMPTS", "Too many failed login attempts. Try again in 15 minutes.");
+            429,
+            "TOO_MANY_ATTEMPTS",
+            "Too many failed login attempts. Try again in " + (lockoutMillis / 60_000) + " minutes.");
       }
     }
   }
 
   private void recordFailure(String key) {
     if (failures.size() > 5000) {
-      long cutoff = System.currentTimeMillis() - LOCKOUT_MILLIS;
+      long cutoff = System.currentTimeMillis() - lockoutMillis;
       failures.entrySet().removeIf(e -> {
         synchronized (e.getValue()) {
           return e.getValue().isEmpty() || e.getValue().peekLast() < cutoff;
