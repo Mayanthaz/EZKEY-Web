@@ -5,6 +5,18 @@ const ONE_YEAR_IMMUTABLE = "public, max-age=31536000, immutable";
 const nextConfig: NextConfig = {
   cacheComponents: true,
 
+  async rewrites() {
+    // The admin panel talks to the Spring Boot backend through this same-origin
+    // path, so its HttpOnly session cookies work without any CORS setup.
+    const backend = (process.env.BACKEND_URL ?? "http://localhost:8080").replace(/\/$/, "");
+    return [
+      {
+        source: "/admin-api/:path*",
+        destination: `${backend}/api/admin/:path*`,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

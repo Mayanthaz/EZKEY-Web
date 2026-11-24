@@ -1,7 +1,29 @@
 import { updateSession } from "@/lib/supabase/proxy";
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+
+// Must match AdminAuthInterceptor.ACCESS_COOKIE in the Spring Boot backend.
+const ADMIN_COOKIE = "ezkey_admin_at";
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Admin panel: /admin/** needs an admin session cookie, otherwise go to the
+  // admin login. This is only a fast UX gate - the Spring Boot backend verifies
+  // the token and the admin role on every /admin-api request.
+  if (
+    (pathname === "/admin" || pathname.startsWith("/admin/")) &&
+    pathname !== "/admin/login" &&
+    !request.cookies.get(ADMIN_COOKIE)
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "";
+    if (pathname !== "/admin") {
+      url.searchParams.set("redirectedFrom", `${pathname}${request.nextUrl.search}`);
+    }
+    return NextResponse.redirect(url);
+  }
+
   return await updateSession(request);
 }
 
