@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -67,6 +68,7 @@ export default function BuyerOrdersPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-fit">
           <TabsList className="bg-cyber-card border border-cyber-border">
             <TabsTrigger value="all">All ({orders.length})</TabsTrigger>
+            <TabsTrigger value="paid">Paid</TabsTrigger>
             <TabsTrigger value="delivered">Delivered</TabsTrigger>
             <TabsTrigger value="completed">Completed</TabsTrigger>
           </TabsList>
@@ -122,8 +124,8 @@ export default function BuyerOrdersPage() {
                       order.status === "completed"
                         ? "default"
                         : order.status === "delivered"
-                        ? "secondary"
-                        : "outline"
+                          ? "secondary"
+                          : "outline"
                     }
                     className="text-[10px] capitalize font-bold"
                   >

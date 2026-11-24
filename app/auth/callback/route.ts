@@ -40,9 +40,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(next, origin));
     }
 
-    return NextResponse.redirect(
-      new URL(`/auth/error?error=${encodeURIComponent(exchangeError.message)}`, origin),
-    );
+    const errorUrl = new URL("/auth/error", origin);
+    errorUrl.searchParams.set("error", exchangeError.message);
+    if (exchangeError.code) {
+      errorUrl.searchParams.set("code", exchangeError.code);
+    }
+    return NextResponse.redirect(errorUrl);
   }
 
   return NextResponse.redirect(
