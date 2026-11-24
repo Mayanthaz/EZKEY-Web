@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  Gamepad2,
   Zap,
   Shield,
   Star,
@@ -12,6 +11,7 @@ import {
   Users,
   ShoppingBag,
   BadgeCheck,
+  Gamepad2,
 } from "lucide-react";
 import {
   MOCK_LISTINGS,

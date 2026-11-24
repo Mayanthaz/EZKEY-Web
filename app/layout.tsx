@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, JetBrains_Mono, Orbitron } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import HideOnAdmin from "@/components/layout/HideOnAdmin";
 import ChatbotFab from "@/components/chatbot-fab";
 import SupabaseAuthErrorRedirect from "@/components/auth/SupabaseAuthErrorRedirect";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -88,13 +89,17 @@ export default function RootLayout({
           <SupabaseAuthErrorRedirect />
         </Suspense>
         <TooltipProvider>
-          <Navbar />
+          <HideOnAdmin>
+            <Navbar />
+          </HideOnAdmin>
           {/* overflow-x-clip: decorative glows can never widen the page on phones
               (which would make mobile browsers zoom out). Unlike overflow-hidden,
               clip keeps position: sticky working. */}
           <main className="min-h-screen overflow-x-clip">{children}</main>
-          <Footer />
-          <ChatbotFab />
+          <HideOnAdmin>
+            <Footer />
+            <ChatbotFab />
+          </HideOnAdmin>
           <Toaster richColors theme="dark" />
         </TooltipProvider>
       </body>

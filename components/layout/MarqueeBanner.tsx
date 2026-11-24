@@ -1,16 +1,16 @@
 import { Sparkle } from "lucide-react";
 
 const PRIMARY_ITEMS: { label: string; accent: boolean }[] = [
-  { label: "EZKEY MARKETPLACE", accent: false },
-  { label: "INSTANT DELIVERY", accent: true },
-  { label: "SECURE ESCROW", accent: false },
-  { label: "VERIFIED SELLERS", accent: true },
+  { label: "UNDER DEVELOPMENT", accent: false },
+  { label: "GO GRAB A COFEE", accent: true },
+  { label: "DEVELOPMENT UNDERWAY", accent: false },
+  { label: "GO GRAB A COFEE", accent: true },
 ];
 
 const SECONDARY_ITEMS: string[] = [
-  "BUYER PROTECTION",
+  "Go grab a cofee",
   "24/7 LIVE SUPPORT",
-  "TRUSTED BY 50,000+ USERS",
+  "Go grab a cofee",
   "ZERO HIDDEN FEES",
 ];
 
@@ -41,9 +41,8 @@ export default function MarqueeBanner() {
                 className="flex shrink-0 items-center gap-6 px-6 sm:gap-10 sm:px-10"
               >
                 <span
-                  className={`font-display whitespace-nowrap text-2xl font-black uppercase tracking-tight sm:text-3xl md:text-4xl ${
-                    item.accent ? "text-neon-blue" : "text-foreground"
-                  }`}
+                  className={`font-display whitespace-nowrap text-2xl font-black uppercase tracking-tight sm:text-3xl md:text-4xl ${item.accent ? "text-neon-blue" : "text-foreground"
+                    }`}
                 >
                   {item.label}
                 </span>
