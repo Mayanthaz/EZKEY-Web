@@ -93,8 +93,8 @@ export default {
         "bounce-soft": "bounce-soft 2s ease-in-out infinite",
         "gradient-shift": "gradient-shift 8s ease infinite",
         "border-glow": "border-glow 3s ease-in-out infinite",
-        "marquee-left": "marquee-left 32s linear infinite",
-        "marquee-right": "marquee-right 28s linear infinite",
+        "marquee-left": "marquee-left 70s linear infinite",
+        "marquee-right": "marquee-right 62s linear infinite",
       },
       keyframes: {
         "glow-pulse": {

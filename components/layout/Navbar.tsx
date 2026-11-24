@@ -100,14 +100,14 @@ export default function Navbar() {
       }`}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between h-16 lg:h-[4.5rem]">
+        <div className="flex items-center justify-between h-[72px] lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
             <div className="relative">
-              <Gamepad2 className="w-7 h-7 text-neon-purple transition-all duration-300 group-hover:text-neon-blue" />
+              <Gamepad2 className="w-9 h-9 text-neon-purple transition-all duration-300 group-hover:text-neon-blue" />
               <div className="absolute inset-0 blur-lg bg-neon-purple/30 group-hover:bg-neon-blue/30 transition-all duration-300" />
             </div>
-            <span className="font-display text-lg font-bold text-gradient tracking-tight">
+            <span className="font-display text-2xl font-bold text-gradient tracking-tight">
               EZKEY
             </span>
           </Link>
@@ -118,7 +118,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3.5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground
+                className="px-4 py-2.5 text-base font-medium text-muted-foreground hover:text-foreground
                            transition-all duration-300 rounded-lg hover:bg-white/[0.05] relative group"
               >
                 {link.label}
@@ -129,17 +129,17 @@ export default function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-6">
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
             <div className="relative w-full group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground
                                group-focus-within:text-neon-purple transition-colors duration-300 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search apps, vouchers, keys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl
-                         text-sm text-foreground placeholder:text-muted-foreground/50
+                className="w-full pl-11 pr-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl
+                         text-base text-foreground placeholder:text-muted-foreground/50
                          focus:outline-none focus:border-neon-purple/50 focus:ring-1 focus:ring-neon-purple/20
                          focus:bg-white/[0.06] transition-all duration-300"
               />
@@ -148,7 +148,7 @@ export default function Navbar() {
                   onClick={() => setSearchQuery("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  <X className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
+                  <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                 </button>
               )}
             </div>
@@ -161,12 +161,12 @@ export default function Navbar() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon" style={{ width: 44, height: 44 }}
                   onClick={handleCartClick}
                   className="relative text-muted-foreground hover:text-foreground hover:bg-white/[0.05] rounded-xl"
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 p-0 flex items-center justify-center text-[10px] bg-neon-purple text-white border-0">
+                  <ShoppingCart className="w-6 h-6" />
+                  <Badge className="absolute -top-0.5 -right-0.5 h-5 w-5 p-0 flex items-center justify-center text-xs bg-neon-purple text-white border-0">
                     0
                   </Badge>
                 </Button>
@@ -181,12 +181,12 @@ export default function Navbar() {
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon" style={{ width: 44, height: 44 }}
                       asChild
                       className="text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-xl"
                     >
                       <Link href="/chat" aria-label="Chat">
-                        <MessageSquare className="w-5 h-5" />
+                        <MessageSquare className="w-6 h-6" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
@@ -198,10 +198,10 @@ export default function Navbar() {
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon" style={{ width: 44, height: 44 }}
                       className="text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-xl"
                     >
-                      <Bell className="w-5 h-5" />
+                      <Bell className="w-6 h-6" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">Notifications</TooltipContent>
@@ -215,12 +215,12 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-2 py-1.5 h-auto hover:bg-white/5 rounded-xl
                                border border-transparent hover:border-white/[0.08] transition-all"
                     >
-                      <Avatar className="h-8 w-8 rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue shrink-0">
-                        <AvatarFallback className="rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue text-white text-sm font-bold">
+                      <Avatar className="h-10 w-10 rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue shrink-0">
+                        <AvatarFallback className="rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue text-white text-base font-bold">
                           {user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground hidden sm:block transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                      <ChevronDown className="w-4 h-4 text-muted-foreground hidden sm:block transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -268,14 +268,14 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   asChild
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-base px-5 text-muted-foreground hover:text-foreground"
                 >
                   <Link href="/auth/login">Log In</Link>
                 </Button>
-                <Button asChild className="btn-neon border-0 text-sm !px-5 !py-2">
+                <Button asChild className="btn-neon border-0 text-base !px-6 !py-2.5">
                   <Link href="/auth/sign-up">
                     <span className="relative z-10 flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5" />
+                      <Zap className="w-4 h-4" />
                       Sign Up
                     </span>
                   </Link>
@@ -315,7 +315,7 @@ export default function Navbar() {
                       type="text"
                       placeholder="Search..."
                       className="w-full pl-10 pr-4 py-2.5 bg-cyber-card/60 border border-white/[0.08] rounded-xl
-                               text-sm text-foreground placeholder:text-muted-foreground/50
+                               text-base text-foreground placeholder:text-muted-foreground/50
                                focus:outline-none focus:border-neon-purple/50"
                     />
                   </div>
