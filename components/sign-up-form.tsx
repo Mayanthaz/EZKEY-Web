@@ -24,6 +24,7 @@ export function SignUpForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [redirectPath, setRedirectPath] = useState("/dashboard");
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
@@ -44,6 +45,7 @@ export function SignUpForm({
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUnverifiedEmail(null);
 
     if (!hasEnvVars) {
       setError(
@@ -65,7 +67,7 @@ export function SignUpForm({
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
         options: {
@@ -76,7 +78,35 @@ export function SignUpForm({
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (error) throw error;
+      if (error) {
+        if (/already registered|already exists/i.test(error.message)) {
+          setError("An account with this email already exists. Please log in instead.");
+          return;
+        }
+        throw error;
+      }
+
+      // With email confirmation enabled, Supabase doesn't error for existing emails:
+      // a verified account comes back as a placeholder user with no identities.
+      if (data.user && data.user.identities?.length === 0) {
+        setError("An account with this email already exists. Please log in instead.");
+        return;
+      }
+
+      // An existing unverified account gets a fresh confirmation code, but its
+      // created_at is in the past rather than "just now".
+      if (
+        data.user?.created_at &&
+        Date.now() - new Date(data.user.created_at).getTime() > 60_000
+      ) {
+        window.sessionStorage.setItem("ezkey:pending-signup-email", trimmedEmail);
+        setUnverifiedEmail(trimmedEmail);
+        setError(
+          "An account with this email already exists but hasn't been verified yet. We've sent a new verification code to your email.",
+        );
+        return;
+      }
+
       window.sessionStorage.setItem("ezkey:pending-signup-email", trimmedEmail);
       router.push(`/auth/verify-email?email=${encodeURIComponent(trimmedEmail)}`);
     } catch (error: unknown) {
@@ -162,13 +192,6 @@ export function SignUpForm({
               <AlertDescription>
                 Authentication is unavailable until Supabase environment variables are added.
               </AlertDescription>
-            </Alert>
-          )}
-
-          {error && (
-            <Alert variant="destructive" className="border-red-500/30 bg-red-500/10 text-red-300">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
@@ -320,7 +343,25 @@ export function SignUpForm({
           {error && (
             <Alert variant="destructive" className="border-red-500/30 bg-red-500/10">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-red-400">{error}</AlertDescription>
+              <AlertDescription className="text-red-400">
+                {error}
+                {unverifiedEmail && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                    <Link
+                      href={`/auth/verify-email?email=${encodeURIComponent(unverifiedEmail)}`}
+                      className="font-medium text-neon-purple hover:text-neon-blue transition-colors"
+                    >
+                      Enter verification code
+                    </Link>
+                    <Link
+                      href="/auth/login"
+                      className="font-medium text-neon-purple hover:text-neon-blue transition-colors"
+                    >
+                      Log in
+                    </Link>
+                  </div>
+                )}
+              </AlertDescription>
             </Alert>
           )}
 
